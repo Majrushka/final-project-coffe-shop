@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Начальная страница</title>
+    </head>
+
+    <body>
+        <h1>Список всех продуктов</h1>
+
+        <h2>Кофе</h2>
+        <ul>
+            {% for coffee in coffees %}
+            <li>{{ coffee.name }} {{ coffee.description }}</li>
+            {% endfor %}
+        </ul>
+
+        <h2>Чай</h2>
+        <ul>
+            {% for tea in teas %}
+            <li>{{ tea.name }} {{ tea.description }}</li>
+            {% endfor %}
+        </ul>
+
+        <h2>Сиропы</h2>
+        <ul>
+            {% for syrup in syrups %}
+            <li>{{ syrup.name }} {{ syrup.description }}</li>
+            {% endfor %}
+        </ul>
+    
+    </body>
+</html>
