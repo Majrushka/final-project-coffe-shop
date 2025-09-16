@@ -96,8 +96,8 @@ class Tea(Product):
     ]
     
     GRAMS_CHOICES = [
-        (50, '50 г'),
         (100, '100 г'),
+        (500, '500 г'),
     ]
     
     # Специфические характеристики чая
@@ -109,24 +109,24 @@ class Tea(Product):
     )
     
     # Цены в зависимости от веса
-    price_50g = models.DecimalField(
-        max_digits=10, 
-        decimal_places=2, 
-        verbose_name='Цена за 50 г',
-        default=0.00
-    )
     price_100g = models.DecimalField(
         max_digits=10, 
         decimal_places=2, 
         verbose_name='Цена за 100 г',
         default=0.00
     )
+    price_500g = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2, 
+        verbose_name='Цена за 500 г',
+        default=0.00
+    )
 
     def get_price(self, grams):
         """Возвращает цену для указанного веса"""
         price_map = {
-            50: self.price_50g,
-            100: self.price_100g
+            100: self.price_100g,
+            500: self.price_500g
         }
         return price_map.get(grams)
 

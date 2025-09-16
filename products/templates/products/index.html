@@ -1,34 +1,158 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Начальная страница</title>
+        <title>Главная - Магазин кофе и чая</title>
+        <style>
+            .product-item {
+                border: 1px solid #ddd;
+                padding: 15px;
+                margin: 10px 0;
+                border-radius: 5px;
+            }
+            .section-title {
+                color: #2c5aa0;
+                border-bottom: 2px solid #2c5aa0;
+                padding-bottom: 10px;
+            }
+            .characteristics {
+                color: #666;
+                font-size: 0.9em;
+                margin: 10px 0;
+            }
+            .prices {
+                color: #2c5aa0;
+                font-weight: bold;
+                background-color: #f8f9fa;
+                padding: 10px;
+                border-radius: 4px;
+                margin: 10px 0;
+            }
+            .availability {
+                font-style: italic;
+                color: #28a745;
+            }
+            .not-available {
+                color: #dc3545;
+            }
+            .product-type {
+                background-color: #6c757d;
+                color: white;
+                padding: 4px 8px;
+                border-radius: 12px;
+                font-size: 0.8em;
+                display: inline-block;
+                margin-bottom: 10px;
+            }
+        </style>
     </head>
 
     <body>
-        <h1>Список всех продуктов</h1>
+        <h1>Добро пожаловать в наш магазин!</h1>
 
-        <h2>Кофе</h2>
-        <ul>
+        <!-- Кофе -->
+        <h2 class="section-title">Кофе ({{ coffees|length }})</h2>
+        {% if coffees %}
             {% for coffee in coffees %}
-            <li>{{ coffee.name }} {{ coffee.description }}</li>
+                <div class="product-item">
+                    <span class="product-type">Кофе</span>
+                    <h3>{{ coffee.name }}</h3>
+                    <p>{{ coffee.description }}</p>
+                    
+                    <div class="characteristics">
+                        <p><strong>Тип:</strong> {{ coffee.get_coffee_type_display }}</p>
+                        <p><strong>Вкусовой профиль:</strong></p>
+                        <ul>
+                            <li>Кислотность: {{ coffee.acidity }}/5</li>
+                            <li>Горчинка: {{ coffee.bitterness }}/5</li>
+                            <li>Насыщенность: {{ coffee.intensity }}/5</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="prices">
+                        <p><strong>Цены:</strong></p>
+                        <ul>
+                            <li>250 г: {{ coffee.price_250g }} руб.</li>
+                            <li>500 г: {{ coffee.price_500g }} руб.</li>
+                            <li>1000 г: {{ coffee.price_1000g }} руб.</li>
+                        </ul>
+                    </div>
+                    
+                    <p class="{% if coffee.is_available %}availability{% else %}not-available{% endif %}">
+                        <strong>В наличии:</strong> {% if coffee.is_available %}Да{% else %}Нет{% endif %}
+                    </p>
+                </div>
             {% endfor %}
-        </ul>
+        {% else %}
+            <p>Кофе временно нет в наличии.</p>
+        {% endif %}
 
-        <h2>Чай</h2>
-        <ul>
+        <!-- Чай -->
+        <h2 class="section-title">Чай ({{ teas|length }})</h2>
+        {% if teas %}
             {% for tea in teas %}
-            <li>{{ tea.name }} {{ tea.description }}</li>
+                <div class="product-item">
+                    <span class="product-type">Чай</span>
+                    <h3>{{ tea.name }}</h3>
+                    <p>{{ tea.description }}</p>
+                    
+                    <div class="characteristics">
+                        <p><strong>Тип:</strong> {{ tea.get_tea_type_display }}</p>
+                    </div>
+                    
+                    <div class="prices">
+                        <p><strong>Цены:</strong></p>
+                        <ul>
+                            <li>100 г: {{ tea.price_100g }} руб.</li>
+                            <li>500 г: {{ tea.price_500g }} руб.</li>
+                        </ul>
+                    </div>
+                    
+                    <p class="{% if tea.is_available %}availability{% else %}not-available{% endif %}">
+                        <strong>В наличии:</strong> {% if tea.is_available %}Да{% else %}Нет{% endif %}
+                    </p>
+                </div>
             {% endfor %}
-        </ul>
+        {% else %}
+            <p>Чай временно нет в наличии.</p>
+        {% endif %}
 
-        <h2>Сиропы</h2>
-        <ul>
+        <!-- Сиропы -->
+        <h2 class="section-title">Сиропы ({{ syrups|length }})</h2>
+        {% if syrups %}
             {% for syrup in syrups %}
-            <li>{{ syrup.name }} {{ syrup.description }}</li>
+                <div class="product-item">
+                    <span class="product-type">Сироп</span>
+                    <h3>{{ syrup.name }}</h3>
+                    <p>{{ syrup.description }}</p>
+                    
+                    <div class="characteristics">
+                        <p><strong>Производитель:</strong> {{ syrup.get_manufacturer_display }}</p>
+                    </div>
+                    
+                    <div class="prices">
+                        <p><strong>Цена:</strong> {{ syrup.price }} руб.</p>
+                    </div>
+                    
+                    <p class="{% if syrup.is_available %}availability{% else %}not-available{% endif %}">
+                        <strong>В наличии:</strong> {% if syrup.is_available %}Да{% else %}Нет{% endif %}
+                    </p>
+                </div>
             {% endfor %}
-        </ul>
+        {% else %}
+            <p>Сиропы временно нет в наличии.</p>
+        {% endif %}
+
+        <!-- Навигация -->
+        <div style="margin-top: 40px; padding: 20px; background-color: #f8f9fa; border-radius: 5px;">
+            <h3>Подробные каталоги:</h3>
+            <p>
+                <a href="{% url 'coffee_list' %}">Весь каталог кофе</a> | 
+                <a href="{% url 'tea_list' %}">Весь каталог чая</a> | 
+                <a href="{% url 'syrup_list' %}">Весь каталог сиропов</a>
+            </p>
+        </div>
     
     </body>
 </html>

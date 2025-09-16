@@ -1,20 +1,56 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Чай</title>
+        <title>Каталог чая</title>
+        <style>
+            .tea-item {
+                border: 1px solid #ddd;
+                padding: 15px;
+                margin: 10px 0;
+                border-radius: 5px;
+            }
+            .characteristics {
+                color: #666;
+                font-size: 0.9em;
+            }
+            .prices {
+                color: #2c5aa0;
+                font-weight: bold;
+            }
+        </style>
     </head>
 
     <body>
-        <h1>Список видов чая</h1>
+        <h1>Каталог чая</h1>
 
-        <ul>
-            {% for tea in teas%}
-            <li>{{ tea.name }} {{ tea.description }}</li>
-            {% endfor %}
-        </ul>
+        {% if teas %}
+            <div class="tea-list">
+                {% for tea in teas %}
+                    <div class="tea-item">
+                        <h2>{{ tea.name }}</h2>
+                        <p>{{ tea.description }}</p>
+                        
+                        <div class="characteristics">
+                            <p><strong>Тип:</strong> {{ tea.get_tea_type_display }}</p>
+                        </div>
+                        
+                        <div class="prices">
+                            <p><strong>Цены:</strong></p>
+                            <ul>
+                                <li>100 г: {{ tea.price_100g }} руб.</li>
+                                <li>500 г: {{ tea.price_500g }} руб.</li>
+                            </ul>
+                        </div>
+                        
+                        <p><em>В наличии: {% if tea.is_available %}Да{% else %}Нет{% endif %}</em></p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>К сожалению, чай временно нет в наличии.</p>
+        {% endif %}
     
     </body>
-
 </html>

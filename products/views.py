@@ -13,7 +13,7 @@ def index(request):
         'coffees': coffees,
         'teas': teas,
         'syrups': syrups,
-        'all_products': list(coffees) + list(teas) + list(syrups),
+        # 'all_products': list(coffees) + list(teas) + list(syrups),
     }
     
     return render(request, 'products/index.html', context)
