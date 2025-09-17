@@ -30,3 +30,6 @@ def tea_list(request):
 def syrup_list(request):
     syrups = Syrup.objects.all().order_by('-is_available')
     return render(request, 'products/syrup_list.html', {"syrups": syrups})
+
+def delivery_info(request):
+    return render(request, 'products/delivery_info.html')

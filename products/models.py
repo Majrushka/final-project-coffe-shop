@@ -148,7 +148,7 @@ class Syrup(Product):
     manufacturer = models.CharField(
         max_length=20,
         choices=MANUFACTURER_CHOICES,
-        verbose_name='Monin',
+        verbose_name='Производитель',
         default='manufacturer1'
     )
     
