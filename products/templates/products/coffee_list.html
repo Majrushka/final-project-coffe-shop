@@ -1,78 +1,68 @@
-<!DOCTYPE html>
-<html lang="ru">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Каталог кофе</title>
-        <style>
-            body {
-                margin: 0 16.66%;
-            }
-            h1 {
-                text-align: center;
-            }
-            .coffee-list {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 20px;
-                justify-content: center;
-            }
-            .coffee-item {
-                border: 1px solid #ddd;
-                padding: 15px;
-                border-radius: 5px;
-                width: calc(37.5% - 10px);
-                box-sizing: border-box;
-                aspect-ratio: 1/1;
-                overflow: hidden;
-            }
-            .characteristics {
-                color: #666;
-                font-size: 0.9em;
-            }
-            .prices {
-                color: #2c5aa0;
-                font-weight: bold;
-            }
-        </style>
-    </head>
+{% extends "products/base.html" %}
 
-    <body>
-        <h1>Каталог кофе</h1>
+{% block content %}
+<style>
+    .coffee-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+    }
+    .coffee-item {
+        border: 1px solid #ddd;
+        padding: 15px;
+        border-radius: 5px;
+        width: calc(37.5% - 10px);
+        box-sizing: border-box;
+        aspect-ratio: 1/1;
+        overflow: hidden;
+    }
+    .characteristics {
+        color: #666;
+        font-size: 0.9em;
+    }
+    .prices {
+        color: #2c5aa0;
+        font-weight: bold;
+    }
+    h1 {
+        text-align: center;
+    }
+</style>
 
-        {% if coffees %}
-            <div class="coffee-list">
-                {% for coffee in coffees %}
-                    <div class="coffee-item">
-                        <h2>{{ coffee.name }}</h2>
-                        <p>{{ coffee.description }}</p>
-                        
-                        <div class="characteristics">
-                            <p><strong>Тип:</strong> {{ coffee.get_coffee_type_display }}</p>
-                            <p><strong>Вкусовой профиль:</strong></p>
-                            <ul>
-                                <li>Кислотность: {{ coffee.acidity }}/5</li>
-                                <li>Горчинка: {{ coffee.bitterness }}/5</li>
-                                <li>Насыщенность: {{ coffee.intensity }}/5</li>
-                            </ul>
-                        </div>
-                        
-                        <div class="prices">
-                            <p><strong>Цены:</strong></p>
-                            <ul>
-                                <li>250 г: {{ coffee.price_250g }} руб.</li>
-                                <li>500 г: {{ coffee.price_500g }} руб.</li>
-                                <li>1000 г: {{ coffee.price_1000g }} руб.</li>
-                            </ul>
-                        </div>
-                        
-                        <p><em>В наличии: {% if coffee.is_available %}Да{% else %}Нет{% endif %}</em></p>
-                    </div>
-                {% endfor %}
+<h1>Каталог кофе</h1>
+
+{% if coffees %}
+    <div class="coffee-list">
+        {% for coffee in coffees %}
+            <div class="coffee-item">
+                <h2>{{ coffee.name }}</h2>
+                <p>{{ coffee.description }}</p>
+                
+                <div class="characteristics">
+                    <p><strong>Тип:</strong> {{ coffee.get_coffee_type_display }}</p>
+                    <p><strong>Вкусовой профиль:</strong></p>
+                    <ul>
+                        <li>Кислотность: {{ coffee.acidity }}/5</li>
+                        <li>Горчинка: {{ coffee.bitterness }}/5</li>
+                        <li>Насыщенность: {{ coffee.intensity }}/5</li>
+                    </ul>
+                </div>
+                
+                <div class="prices">
+                    <p><strong>Цены:</strong></p>
+                    <ul>
+                        <li>250 г: {{ coffee.price_250g }} руб.</li>
+                        <li>500 г: {{ coffee.price_500g }} руб.</li>
+                        <li>1000 г: {{ coffee.price_1000g }} руб.</li>
+                    </ul>
+                </div>
+                
+                <p><em>В наличии: {% if coffee.is_available %}Да{% else %}Нет{% endif %}</em></p>
             </div>
-        {% else %}
-            <p>К сожалению, кофе временно нет в наличии.</p>
-        {% endif %}
-    
-    </body>
-</html>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>К сожалению, кофе временно нет в наличии.</p>
+{% endif %}
+{% endblock content %}

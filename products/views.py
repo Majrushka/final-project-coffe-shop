@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from .models import Coffee, Tea, Syrup
+from .models import Coffee, Tea, Syrup, Product
 
 # Create your views here.
 
@@ -33,3 +33,8 @@ def syrup_list(request):
 
 def delivery_info(request):
     return render(request, 'products/delivery_info.html')
+
+def search(request):
+    query = request.GET.get('q', '')
+    products = Product.objects.filter(name__icontains=query) # Поиск по части названия
+    return render(request, 'search_results.html', {'products': products, 'query': query})

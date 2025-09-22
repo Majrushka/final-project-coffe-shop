@@ -1,67 +1,58 @@
-<!DOCTYPE html>
-<html lang="ru">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Каталог сиропов</title>
-        <style>
-            body {
-                margin: 0 16.66%;
-            }
-            h1 {
-                text-align: center;
-            }
-            .syrup-list {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 20px;
-                justify-content: center;
-            }
-            .syrup-item {
-                border: 1px solid #ddd;
-                padding: 15px;
-                border-radius: 5px;
-                width: calc(50% - 10px);
-                box-sizing: border-box;
-                aspect-ratio: 1/1;
-                overflow: hidden;
-            }
-            .characteristics {
-                color: #666;
-                font-size: 0.9em;
-            }
-            .prices {
-                color: #2c5aa0;
-                font-weight: bold;
-            }
-        </style>
-    </head>
 
-    <body>
-        <h1>Каталог сиропов</h1>
+{% extends "products/base.html" %}
 
-        {% if syrups %}
-            <div class="syrup-list">
-                {% for syrup in syrups %}
-                    <div class="syrup-item">
-                        <h2>{{ syrup.name }}</h2>
-                        <p>{{ syrup.description }}</p>
-                        
-                        <div class="characteristics">
-                            <p><strong>Производитель:</strong> {{ syrup.get_manufacturer_display }}</p>
-                        </div>
-                        
-                        <div class="prices">
-                            <p><strong>Цена:</strong> {{ syrup.price }} руб.</p>
-                        </div>
-                        
-                        <p><em>В наличии: {% if syrup.is_available %}Да{% else %}Нет{% endif %}</em></p>
-                    </div>
-                {% endfor %}
+{% block content %}
+<style>
+    h1 {
+        text-align: center;
+    }
+    .syrup-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+    }
+    .syrup-item {
+        border: 1px solid #ddd;
+        padding: 15px;
+        border-radius: 5px;
+        width: calc(50% - 10px);
+        box-sizing: border-box;
+        aspect-ratio: 1/1;
+        overflow: hidden;
+    }
+    .characteristics {
+        color: #666;
+        font-size: 0.9em;
+    }
+    .prices {
+        color: #2c5aa0;
+        font-weight: bold;
+    }
+</style>
+
+<h1>Каталог сиропов</h1>
+
+{% if syrups %}
+    <div class="syrup-list">
+        {% for syrup in syrups %}
+            <div class="syrup-item">
+                <h2>{{ syrup.name }}</h2>
+                <p>{{ syrup.description }}</p>
+                
+                <div class="characteristics">
+                    <p><strong>Производитель:</strong> {{ syrup.get_manufacturer_display }}</p>
+                </div>
+                
+                <div class="prices">
+                    <p><strong>Цена:</strong> {{ syrup.price }} руб.</p>
+                </div>
+                
+                <p><em>В наличии: {% if syrup.is_available %}Да{% else %}Нет{% endif %}</em></p>
             </div>
-        {% else %}
-            <p>К сожалению, сиропы временно нет в наличии.</p>
-        {% endif %}
-    
-    </body>
-</html>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>К сожалению, сиропов временно нет в наличии.</p>
+{% endif %}
+{% endblock content %}

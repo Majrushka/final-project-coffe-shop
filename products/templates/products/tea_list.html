@@ -1,71 +1,61 @@
-<!DOCTYPE html>
-<html lang="ru">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Каталог чая</title>
-        <style>
-            body {
-                margin: 0 16.66%;
-            }
-            h1 {
-                text-align: center;
-            }
-            .tea-list {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 20px;
-                justify-content: center;
-            }
-            .tea-item {
-                border: 1px solid #ddd;
-                padding: 15px;
-                border-radius: 5px;
-                width: calc(37.5% - 10px);
-                box-sizing: border-box;
-                aspect-ratio: 1/1;
-                overflow: hidden;
-            }
-            .characteristics {
-                color: #666;
-                font-size: 0.9em;
-            }
-            .prices {
-                color: #2c5aa0;
-                font-weight: bold;
-            }
-        </style>
-    </head>
+{% extends "products/base.html" %}
 
-    <body>
-        <h1>Каталог чая</h1>
+{% block content %}
+<style>
+    h1 {
+        text-align: center;
+    }
+    .tea-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+    }
+    .tea-item {
+        border: 1px solid #ddd;
+        padding: 15px;
+        border-radius: 5px;
+        width: calc(37.5% - 10px);
+        box-sizing: border-box;
+        aspect-ratio: 1/1;
+        overflow: hidden;
+    }
+    .characteristics {
+        color: #666;
+        font-size: 0.9em;
+    }
+    .prices {
+        color: #2c5aa0;
+        font-weight: bold;
+    }
+</style>
 
-        {% if teas %}
-            <div class="tea-list">
-                {% for tea in teas %}
-                    <div class="tea-item">
-                        <h2>{{ tea.name }}</h2>
-                        <p>{{ tea.description }}</p>
-                        
-                        <div class="characteristics">
-                            <p><strong>Тип:</strong> {{ tea.get_tea_type_display }}</p>
-                        </div>
-                        
-                        <div class="prices">
-                            <p><strong>Цены:</strong></p>
-                            <ul>
-                                <li>100 г: {{ tea.price_100g }} руб.</li>
-                                <li>500 г: {{ tea.price_500g }} руб.</li>
-                            </ul>
-                        </div>
-                        
-                        <p><em>В наличии: {% if tea.is_available %}Да{% else %}Нет{% endif %}</em></p>
-                    </div>
-                {% endfor %}
+<h1>Каталог чая</h1>
+
+{% if teas %}
+    <div class="tea-list">
+        {% for tea in teas %}
+            <div class="tea-item">
+                <h2>{{ tea.name }}</h2>
+                <p>{{ tea.description }}</p>
+                
+                <div class="characteristics">
+                    <p><strong>Тип:</strong> {{ tea.get_tea_type_display }}</p>
+                </div>
+                
+                <div class="prices">
+                    <p><strong>Цены:</strong></p>
+                    <ul>
+                        <li>100 г: {{ tea.price_100g }} руб.</li>
+                        <li>500 г: {{ tea.price_500g }} руб.</li>
+                    </ul>
+                </div>
+                
+                <p><em>В наличии: {% if tea.is_available %}Да{% else %}Нет{% endif %}</em></p>
             </div>
-        {% else %}
-            <p>К сожалению, чай временно нет в наличии.</p>
-        {% endif %}
-    
-    </body>
-</html>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>К сожалению, чая временно нет в наличии.</p>
+{% endif %}
+{% endblock content %}

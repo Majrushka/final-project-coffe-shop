@@ -1,304 +1,168 @@
-<!DOCTYPE html>
-<html lang="ru">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Главная - Магазин кофе и чая</title>
-        <style>
-            /* Стили для навигации */
-            .navigation {
-                background-color: #2c5aa0;
-                padding: 15px 0;
-                margin-bottom: 30px;
-            }
-            
-            .nav-container {
-                max-width: 1200px;
-                margin: 0 auto;
-                padding: 0 20px;
-                display: flex;
-                align-items: center;
-                gap: 15px;
-            }
-            
-            .catalog-button {
-                position: relative;
-                display: inline-block;
-                background-color: #4a76a8;
-                color: white;
-                padding: 12px 24px;
-                text-decoration: none;
-                border-radius: 5px;
-                font-weight: bold;
-                cursor: pointer;
-                transition: background-color 0.3s ease;
-            }
-            
-            .catalog-button:hover {
-                background-color: #3a6698;
-            }
-            
-            .delivery-button {
-                display: inline-block;
-                background-color: #28a745;
-                color: white;
-                padding: 12px 24px;
-                text-decoration: none;
-                border-radius: 5px;
-                font-weight: bold;
-                transition: background-color 0.3s ease;
-            }
-            
-            .delivery-button:hover {
-                background-color: #218838;
-            }
-            
-            .phone-number {
-                color: white;
-                font-weight: bold;
-            }
-            
-            .dropdown-content {
-                display: none;
-                position: absolute;
-                background-color: white;
-                min-width: 200px;
-                box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-                z-index: 1000;
-                border-radius: 5px;
-                overflow: hidden;
-            }
-            
-            .dropdown-content a {
-                color: #333;
-                padding: 12px 16px;
-                text-decoration: none;
-                display: block;
-                transition: background-color 0.3s ease;
-            }
-            
-            .dropdown-content a:hover {
-                background-color: #f1f1f1;
-                color: #2c5aa0;
-            }
-            
-            .catalog-container:hover .dropdown-content {
-                display: block;
-            }
+{% extends "products/base.html" %}
 
-            /* Стили для продуктов */
-            .products-container {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 20px;
-                justify-content: center;
-                margin: 20px 0;
-            }
-            
-            .product-item {
-                border: 1px solid #ddd;
-                padding: 15px;
-                border-radius: 5px;
-                width: calc(50% - 10px);
-                box-sizing: border-box;
-                aspect-ratio: 1/1;
-                overflow: hidden;
-            }
-            
-            .section-title {
-                color: #2c5aa0;
-                border-bottom: 2px solid #2c5aa0;
-                padding-bottom: 10px;
-                margin-top: 30px;
-            }
-            
-            .characteristics {
-                color: #666;
-                font-size: 0.9em;
-                margin: 10px 0;
-            }
-            
-            .prices {
-                color: #2c5aa0;
-                font-weight: bold;
-                background-color: #f8f9fa;
-                padding: 10px;
-                border-radius: 4px;
-                margin: 10px 0;
-            }
-            
-            .availability {
-                font-style: italic;
-                color: #28a745;
-            }
-            
-            .not-available {
-                color: #dc3545;
-            }
-            
-            .product-type {
-                background-color: #6c757d;
-                color: white;
-                padding: 4px 8px;
-                border-radius: 12px;
-                font-size: 0.8em;
-                display: inline-block;
-                margin-bottom: 10px;
-            }
-            
-            /* Стили для футера */
-            .footer {
-                margin-top: 40px;
-                padding: 20px;
-                background-color: #f8f9fa;
-                border-radius: 5px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-            
-            .copyright {
-                color: #666;
-                font-size: 0.9em;
-            }
-        </style>
-    </head>
-
-    <body>
-        <!-- Навигация с кнопкой каталога -->
-        <div class="navigation">
-            <div class="nav-container">
-                <div class="catalog-container" style="display: inline-block;">
-                    <div class="catalog-button">Каталог ▼</div>
-                    <div class="dropdown-content">
-                        <a href="{% url 'coffee_list' %}">Кофе</a>
-                        <a href="{% url 'tea_list' %}">Чай</a>
-                        <a href="{% url 'syrup_list' %}">Сиропы</a>
-                    </div>
-                </div>
-                
-                <!-- Новая кнопка Доставка и оплата -->
-                <a href="{% url 'delivery_info' %}" class="delivery-button">
-                    Доставка и оплата
-                </a>
-                
-                <!-- Номер телефона -->
-                <div class="phone-number">+375 (33) 123-45-67</div>
-            </div>
-        </div>
-
-        <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
-            <h1>Добро пожаловать в наш магазин!</h1>
-
-            <!-- Кофе -->
-            <h2 class="section-title">Кофе ({{ coffees|length }})</h2>
-            {% if coffees %}
-                <div class="products-container">
-                    {% for coffee in coffees %}
-                        <div class="product-item">
-                            <span class="product-type">Кофе</span>
-                            <h3>{{ coffee.name }}</h3>
-                            <p>{{ coffee.description }}</p>
-                            
-                            <div class="characteristics">
-                                <p><strong>Тип:</strong> {{ coffee.get_coffee_type_display }}</p>
-                                <p><strong>Вкусовой профиль:</strong></p>
-                                <ul>
-                                    <li>Кислотность: {{ coffee.acidity }}/5</li>
-                                    <li>Горчинка: {{ coffee.bitterness }}/5</li>
-                                    <li>Насыщенность: {{ coffee.intensity }}/5</li>
-                                </ul>
-                            </div>
-                            
-                            <div class="prices">
-                                <p><strong>Цены:</strong></p>
-                                <ul>
-                                    <li>250 г: {{ coffee.price_250g }} руб.</li>
-                                    <li>500 г: {{ coffee.price_500g }} руб.</li>
-                                    <li>1000 г: {{ coffee.price_1000g }} руб.</li>
-                                </ul>
-                            </div>
-                            
-                            <p class="{% if coffee.is_available %}availability{% else %}not-available{% endif %}">
-                                <strong>В наличии:</strong> {% if coffee.is_available %}Да{% else %}Нет{% endif %}
-                            </p>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <p>Кофе временно нет в наличии.</p>
-            {% endif %}
-
-            <!-- Чай -->
-            <h2 class="section-title">Чай ({{ teas|length }})</h2>
-            {% if teas %}
-                <div class="products-container">
-                    {% for tea in teas %}
-                        <div class="product-item">
-                            <span class="product-type">Чай</span>
-                            <h3>{{ tea.name }}</h3>
-                            <p>{{ tea.description }}</p>
-                            
-                            <div class="characteristics">
-                                <p><strong>Тип:</strong> {{ tea.get_tea_type_display }}</p>
-                            </div>
-                            
-                            <div class="prices">
-                                <p><strong>Цены:</strong></p>
-                                <ul>
-                                    <li>100 г: {{ tea.price_100g }} руб.</li>
-                                    <li>500 г: {{ tea.price_500g }} руб.</li>
-                                </ul>
-                            </div>
-                            
-                            <p class="{% if tea.is_available %}availability{% else %}not-available{% endif %}">
-                                <strong>В наличии:</strong> {% if tea.is_available %}Да{% else %}Нет{% endif %}
-                            </p>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <p>Чай временно нет в наличии.</p>
-            {% endif %}
-
-            <!-- Сиропы -->
-            <h2 class="section-title">Сиропы ({{ syrups|length }})</h2>
-            {% if syrups %}
-                <div class="products-container">
-                    {% for syrup in syrups %}
-                        <div class="product-item">
-                            <span class="product-type">Сироп</span>
-                            <h3>{{ syrup.name }}</h3>
-                            <p>{{ syrup.description }}</p>
-                            
-                            <div class="characteristics">
-                                <p><strong>Производитель:</strong> {{ syrup.get_manufacturer_display }}</p>
-                            </div>
-                            
-                            <div class="prices">
-                                <p><strong>Цена:</strong> {{ syrup.price }} руб.</p>
-                            </div>
-                            
-                            <p class="{% if syrup.is_available %}availability{% else %}not-available{% endif %}">
-                                <strong>В наличии:</strong> {% if syrup.is_available %}Да{% else %}Нет{% endif %}
-                            </p>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <p>Сиропы временно нет в наличии.</p>
-            {% endif %}
-
-            <!-- Футер -->
-            <div class="footer">
-                <div class="copyright">© 2025 Fun Coffee, Все права защищены</div>
-                <div>
-                    <a href="{% url 'coffee_list' %}">Весь каталог кофе</a> | 
-                    <a href="{% url 'tea_list' %}">Весь каталог чая</a> | 
-                    <a href="{% url 'syrup_list' %}">Весь каталог сиропов</a>
-                </div>
-            </div>
-        </div>
+{% block content %}
+<style>
+    /* Стили для продуктов */
+    .products-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+        margin: 20px 0;
+    }
     
-    </body>
-</html>
+    .product-item {
+        border: 1px solid #ddd;
+        padding: 15px;
+        border-radius: 5px;
+        width: calc(50% - 10px);
+        box-sizing: border-box;
+        aspect-ratio: 1/1;
+        overflow: hidden;
+    }
+    
+    .section-title {
+        color: #2c5aa0;
+        border-bottom: 2px solid #2c5aa0;
+        padding-bottom: 10px;
+        margin-top: 30px;
+    }
+    
+    .characteristics {
+        color: #666;
+        font-size: 0.9em;
+        margin: 10px 0;
+    }
+    
+    .prices {
+        color: #2c5aa0;
+        font-weight: bold;
+        background-color: #f8f9fa;
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+    }
+    
+    .availability {
+        font-style: italic;
+        color: #28a745;
+    }
+    
+    .not-available {
+        color: #dc3545;
+    }
+    
+    .product-type {
+        background-color: #6c757d;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.8em;
+        display: inline-block;
+        margin-bottom: 10px;
+    }
+</style>
+
+<div style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+    <h1>Добро пожаловать в наш магазин!</h1>
+
+    <!-- Кофе -->
+    <h2 class="section-title">Кофе ({{ coffees|length }})</h2>
+    {% if coffees %}
+        <div class="products-container">
+            {% for coffee in coffees %}
+                <div class="product-item">
+                    <span class="product-type">Кофе</span>
+                    <h3>{{ coffee.name }}</h3>
+                    <p>{{ coffee.description }}</p>
+                    
+                    <div class="characteristics">
+                        <p><strong>Тип:</strong> {{ coffee.get_coffee_type_display }}</p>
+                        <p><strong>Вкусовой профиль:</strong></p>
+                        <ul>
+                            <li>Кислотность: {{ coffee.acidity }}/5</li>
+                            <li>Горчинка: {{ coffee.bitterness }}/5</li>
+                            <li>Насыщенность: {{ coffee.intensity }}/5</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="prices">
+                        <p><strong>Цены:</strong></p>
+                        <ul>
+                            <li>250 г: {{ coffee.price_250g }} руб.</li>
+                            <li>500 г: {{ coffee.price_500g }} руб.</li>
+                            <li>1000 г: {{ coffee.price_1000g }} руб.</li>
+                        </ul>
+                    </div>
+                    
+                    <p class="{% if coffee.is_available %}availability{% else %}not-available{% endif %}">
+                        <strong>В наличии:</strong> {% if coffee.is_available %}Да{% else %}Нет{% endif %}
+                    </p>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Кофе временно нет в наличии.</p>
+    {% endif %}
+
+    <!-- Чай -->
+    <h2 class="section-title">Чай ({{ teas|length }})</h2>
+    {% if teas %}
+        <div class="products-container">
+            {% for tea in teas %}
+                <div class="product-item">
+                    <span class="product-type">Чай</span>
+                    <h3>{{ tea.name }}</h3>
+                    <p>{{ tea.description }}</p>
+                    
+                    <div class="characteristics">
+                        <p><strong>Тип:</strong> {{ tea.get_tea_type_display }}</p>
+                    </div>
+                    
+                    <div class="prices">
+                        <p><strong>Цены:</strong></p>
+                        <ul>
+                            <li>100 г: {{ tea.price_100g }} руб.</li>
+                            <li>500 г: {{ tea.price_500g }} руб.</li>
+                        </ul>
+                    </div>
+                    
+                    <p class="{% if tea.is_available %}availability{% else %}not-available{% endif %}">
+                        <strong>В наличии:</strong> {% if tea.is_available %}Да{% else %}Нет{% endif %}
+                    </p>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Чая временно нет в наличии.</p>
+    {% endif %}
+
+    <!-- Сиропы -->
+    <h2 class="section-title">Сиропы ({{ syrups|length }})</h2>
+    {% if syrups %}
+        <div class="products-container">
+            {% for syrup in syrups %}
+                <div class="product-item">
+                    <span class="product-type">Сироп</span>
+                    <h3>{{ syrup.name }}</h3>
+                    <p>{{ syrup.description }}</p>
+                    
+                    <div class="characteristics">
+                        <p><strong>Производитель:</strong> {{ syrup.get_manufacturer_display }}</p>
+                    </div>
+                    
+                    <div class="prices">
+                        <p><strong>Цена:</strong> {{ syrup.price }} руб.</p>
+                    </div>
+                    
+                    <p class="{% if syrup.is_available %}availability{% else %}not-available{% endif %}">
+                        <strong>В наличии:</strong> {% if syrup.is_available %}Да{% else %}Нет{% endif %}
+                    </p>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Сиропа временно нет в наличии.</p>
+    {% endif %}
+</div>
+{% endblock content %}
