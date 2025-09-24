@@ -4,6 +4,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Product(models.Model):
     """Базовая модель продукта"""
+    id = models.AutoField(primary_key=True, verbose_name='ID')
     name = models.CharField(max_length=100, verbose_name='Название')
     description = models.TextField(blank=True, verbose_name='Описание', default='')
     is_available = models.BooleanField(default=True, verbose_name='В наличии')
@@ -12,6 +13,7 @@ class Product(models.Model):
         abstract = True
 
 class Coffee(Product):
+    id = models.AutoField(primary_key=True, verbose_name='ID')
     COFFEE_TYPE_CHOICES = [
         ('arabica', 'Арабика'),
         ('robusta', 'Робуста'),
@@ -90,6 +92,7 @@ class Coffee(Product):
 
 
 class Tea(Product):
+    id = models.AutoField(primary_key=True, verbose_name='ID')
     TEA_TYPE_CHOICES = [
         ('black', 'Черный'),
         ('green', 'Зеленый'),
@@ -139,6 +142,7 @@ class Tea(Product):
 
 
 class Syrup(Product):
+    id = models.AutoField(primary_key=True, verbose_name='ID')
     MANUFACTURER_CHOICES = [
         ('manufacturer1', 'Monin'),
         ('manufacturer2', 'Barinoff'),
@@ -165,4 +169,3 @@ class Syrup(Product):
     class Meta:
         verbose_name = 'Сироп'
         verbose_name_plural = 'Сиропы'
-
