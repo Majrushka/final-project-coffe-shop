@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
     <head>
@@ -50,6 +51,13 @@
                 display: flex;
                 align-items: center;
                 gap: 15px;
+            }
+            
+            /* Стили для фавикона */
+            .favicon {
+                width: 32px;
+                height: 32px;
+                display: block;
             }
             
             .main-button {
@@ -227,6 +235,9 @@
             <div class="navigation">
                 <div class="nav-container">
                     <div class="nav-left">
+                        <!-- Фавикон слева от кнопки Главная -->
+                        <img src="{% static 'products/images/favicon.ico' %}" alt="Фавикон" class="favicon">
+                        
                         <!-- Кнопка Главная -->
                         <a href="{% url 'index' %}" class="main-button">
                             Главная

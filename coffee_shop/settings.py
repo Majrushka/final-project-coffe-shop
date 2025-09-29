@@ -125,4 +125,12 @@ STATIC_URL = 'static/'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
+# Пути, по которым Django ищет статические файлы
+STATICFILES_DIRS = [
+    BASE_DIR / "static",  # Проектная папка static
+]
+
+# Папка для сбора статики командой collectstatic (для продакшена)
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
