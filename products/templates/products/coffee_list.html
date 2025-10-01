@@ -16,6 +16,19 @@
         box-sizing: border-box;
         aspect-ratio: 1/1;
         overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .coffee-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .coffee-title {
+        color: #2c5aa0;
+        text-decoration: none;
+    }
+    .coffee-title:hover {
+        text-decoration: underline;
+        color: #1e3d6f;
     }
     .characteristics {
         color: #666;
@@ -36,7 +49,11 @@
     <div class="coffee-list">
         {% for coffee in coffees %}
             <div class="coffee-item">
-                <h2>{{ coffee.name }}</h2>
+                <h2>
+                    <a href="{% url 'coffee_detail' coffee.pk %}" class="coffee-title">
+                        {{ coffee.name }}
+                    </a>
+                </h2>
                 <p>{{ coffee.description }}</p>
                 
                 <div class="characteristics">

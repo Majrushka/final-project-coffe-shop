@@ -1,4 +1,3 @@
-
 {% extends "products/base.html" %}
 
 {% block content %}
@@ -20,6 +19,19 @@
         box-sizing: border-box;
         aspect-ratio: 1/1;
         overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .syrup-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .syrup-title {
+        color: #2c5aa0;
+        text-decoration: none;
+    }
+    .syrup-title:hover {
+        text-decoration: underline;
+        color: #1e3d6f;
     }
     .characteristics {
         color: #666;
@@ -37,7 +49,11 @@
     <div class="syrup-list">
         {% for syrup in syrups %}
             <div class="syrup-item">
-                <h2>{{ syrup.name }}</h2>
+                <h2>
+                    <a href="{% url 'syrup_detail' syrup.pk %}" class="syrup-title">
+                        {{ syrup.name }}
+                    </a>
+                </h2>
                 <p>{{ syrup.description }}</p>
                 
                 <div class="characteristics">

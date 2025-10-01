@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ syrup.name }}</title>
+</head>
+<body>
+    <h1>{{ syrup.name }}</h1>
+    <p><strong>Производитель:</strong> {{ syrup.get_manufacturer_display }}</p>
+    <p><strong>Описание:</strong> {{ syrup.description }}</p>
+    <p><strong>Цена:</strong> {{ syrup.price }} руб.</p>
+    <p><strong>Наличие:</strong> {% if syrup.is_available %}В наличии{% else %}Нет в наличии{% endif %}</p>
+    <a href="{% url 'index' %}">Назад к списку продуктов</a>
+</body>
+</html>

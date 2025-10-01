@@ -1,11 +1,33 @@
-<h1>Результаты поиска для "{{ query }}"</h1>
-
-{% if products %}
-    <ul>
-        {% for product in products %}
-            <li>{{ product.name }}</li>
+{% if results %}
+    <div class="products-grid">
+        {% for product in results %}
+            <div class="product-item">
+                <!-- Исправленная логика определения типа продукта -->
+                {% if product in coffees %}
+                    <a href="{% url 'coffee_detail' product.pk %}">
+                        <h3>{{ product.name }}</h3>
+                    </a>
+                    <p>Кофе</p>
+                {% elif product in teas %}
+                    <a href="{% url 'tea_detail' product.pk %}">
+                        <h3>{{ product.name }}</h3>
+                    </a>
+                    <p>Чай</p>
+                {% elif product in syrups %}
+                    <a href="{% url 'syrup_detail' product.pk %}">
+                        <h3>{{ product.name }}</h3>
+                    </a>
+                    <p>Сироп</p>
+                {% endif %}
+                
+                {% if product.is_available %}
+                    <span class="available">В наличии</span>
+                {% else %}
+                    <span class="not-available">Нет в наличии</span>
+                {% endif %}
+            </div>
         {% endfor %}
-    </ul>
+    </div>
 {% else %}
-    <p>Товары по вашему запросу не найдены.</p>
+    <p>Ничего не найдено.</p>
 {% endif %}

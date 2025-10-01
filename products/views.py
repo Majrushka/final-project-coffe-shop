@@ -1,7 +1,6 @@
-from django.shortcuts import render
-# from django.views import generic
-# from django.shortcuts import get_object_or_404
+from django.shortcuts import render, get_object_or_404
 # from django.http import HttpResponse
+from django.db.models import Q
 from .models import Coffee, Tea, Syrup
 
 # Create your views here.
@@ -35,19 +34,38 @@ def syrup_list(request):
 def delivery_info(request):
     return render(request, 'products/delivery_info.html')
 
-# def coffee_detail(request, pk):
-#     coffee = get_object_or_404(Coffee, pk=pk)
-#     return render(request, 'products/coffee_detail.html', {'coffee': coffee})
+def coffee_detail(request, pk):
+    coffee = get_object_or_404(Coffee, pk=pk)
+    return render(request, 'products/coffee_detail.html', {'coffee': coffee})
 
-# def tea_detail(request, pk):
-#     tea = get_object_or_404(Tea, pk=pk)
-#     return render(request, 'products/tea_detail.html', {'tea': tea})
+def tea_detail(request, pk):
+    tea = get_object_or_404(Tea, pk=pk)
+    return render(request, 'products/tea_detail.html', {'tea': tea})
 
-# def syrup_detail(request, pk):
-#     syrup = get_object_or_404(Syrup, pk=pk)
-#     return render(request, 'products/syrup_detail.html', {'syrup': syrup})
+def syrup_detail(request, pk):
+    syrup = get_object_or_404(Syrup, pk=pk)
+    return render(request, 'products/syrup_detail.html', {'syrup': syrup})
 
-# def search(request):
-#     query = request.GET.get('q', '')
-#     products = Product.objects.filter(name__icontains=query) # Поиск по части названия
-#     return render(request, 'search_results.html', {'products': products, 'query': query})
+
+def product_search(request):
+    query = request.GET.get('q', '')
+    results = []
+    
+    all_coffees = Coffee.objects.all()
+    all_teas = Tea.objects.all()
+    all_syrups = Syrup.objects.all()
+    
+    if query:
+        coffee_results = all_coffees.filter(Q(name__icontains=query))
+        tea_results = all_teas.filter(Q(name__icontains=query))
+        syrup_results = all_syrups.filter(Q(name__icontains=query))
+        
+        results = list(coffee_results) + list(tea_results) + list(syrup_results)
+    
+    return render(request, 'products/search_results.html', {
+        'results': results,
+        'query': query,
+        'coffees': all_coffees,  
+        'teas': all_teas,        
+        'syrups': all_syrups,    
+    })

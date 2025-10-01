@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ coffee.name }}</title>
+</head>
+<body>
+    <h1>{{ coffee.name }}</h1>
+    <p><strong>Тип:</strong> {{ coffee.get_coffee_type_display }}</p>
+    <p><strong>Описание:</strong> {{ coffee.description }}</p>
+    <p><strong>Цены:</strong></p>
+    <ul>
+        <li>250 г: {{ coffee.price_250g }} руб.</li>
+        <li>500 г: {{ coffee.price_500g }} руб.</li>
+        <li>1000 г: {{ coffee.price_1000g }} руб.</li>
+    </ul>
+    <p><strong>Характеристики вкуса:</strong></p>
+    <ul>
+        <li>Кислотность: {{ coffee.acidity }}/5</li>
+        <li>Горчинка: {{ coffee.bitterness }}/5</li>
+        <li>Насыщенность: {{ coffee.intensity }}/5</li>
+    </ul>
+    <p><strong>Наличие:</strong> {% if coffee.is_available %}В наличии{% else %}Нет в наличии{% endif %}</p>
+    <a href="{% url 'index' %}">Назад к списку продуктов</a>
+</body>
+</html>

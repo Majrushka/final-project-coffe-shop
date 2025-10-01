@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ tea.name }}</title>
+</head>
+<body>
+    <h1>{{ tea.name }}</h1>
+    <p><strong>Тип:</strong> {{ tea.get_tea_type_display }}</p>
+    <p><strong>Описание:</strong> {{ tea.description }}</p>
+    <p><strong>Цены:</strong></p>
+    <ul>
+        <li>100 г: {{ tea.price_100g }} руб.</li>
+        <li>500 г: {{ tea.price_500g }} руб.</li>
+    </ul>
+    <p><strong>Наличие:</strong> {% if tea.is_available %}В наличии{% else %}Нет в наличии{% endif %}</p>
+    <a href="{% url 'index' %}">Назад к списку продуктов</a>
+</body>
+</html>

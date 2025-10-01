@@ -1,298 +1,281 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="ru">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Магазин кофе и чая</title>
-        <style>
-            /* Основная структура */
-            html, body {
-                height: 100%;
-                margin: 0;
-            }
-            
-            body {
-                display: flex;
-                flex-direction: column;
-                min-height: 100vh;
-            }
-            
-            .content-wrapper {
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-            }
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Магазин кофе и чая</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css">
+    <style>
+        /* Все ваши существующие стили остаются без изменений */
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
 
-            /* Стили для навигации */
-            .navigation {
-                background-color: #2c5aa0;
-                padding: 15px 0;
-                margin-bottom: 30px;
-            }
-            
-            .nav-container {
-                max-width: 1200px;
-                margin: 0 auto;
-                padding: 0 20px;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                gap: 15px;
-            }
-            
-            .nav-left {
-                display: flex;
-                align-items: center;
-                gap: 15px;
-            }
-            
-            .nav-right {
-                display: flex;
-                align-items: center;
-                gap: 15px;
-            }
-            
-            /* Стили для фавикона */
-            .favicon {
-                width: 32px;
-                height: 32px;
-                display: block;
-            }
-            
-            .main-button {
-                display: inline-block;
-                background-color: #28a745;
-                color: white;
-                padding: 12px 24px;
-                text-decoration: none;
-                border-radius: 5px;
-                font-weight: bold;
-                transition: background-color 0.3s ease;
-            }
-            
-            .main-button:hover {
-                background-color: #218838;
-            }
-            
-            .catalog-button {
-                position: relative;
-                display: inline-block;
-                background-color: #28a745;
-                color: white;
-                padding: 12px 24px;
-                text-decoration: none;
-                border-radius: 5px;
-                font-weight: bold;
-                cursor: pointer;
-                transition: background-color 0.3s ease;
-            }
-            
-            .catalog-button:hover {
-                background-color: #218838;
-            }
-            
-            .delivery-button {
-                display: inline-block;
-                background-color: #28a745;
-                color: white;
-                padding: 12px 24px;
-                text-decoration: none;
-                border-radius: 5px;
-                font-weight: bold;
-                transition: background-color 0.3s ease;
-            }
-            
-            .delivery-button:hover {
-                background-color: #218838;
-            }
-            
-            .login-button {
-                display: inline-block;
-                background-color: #28a745;
-                color: white;
-                padding: 12px 24px;
-                text-decoration: none;
-                border-radius: 5px;
-                font-weight: bold;
-                transition: background-color 0.3s ease;
-            }
-            
-            .login-button:hover {
-                background-color: #218838;
-            }
-            
-            .register-button {
-                display: inline-block;
-                background-color: #28a745;
-                color: white;
-                padding: 12px 24px;
-                text-decoration: none;
-                border-radius: 5px;
-                font-weight: bold;
-                transition: background-color 0.3s ease;
-            }
-            
-            .register-button:hover {
-                background-color: #218838;
-            }
-            
-            .user-greeting {
-                color: white;
-                font-weight: bold;
-                padding: 12px 24px;
-            }
-            
-            .phone-number {
-                color: white;
-                font-weight: bold;
-            }
-            
-            .dropdown-content {
-                display: none;
-                position: absolute;
-                background-color: white;
-                min-width: 200px;
-                box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-                z-index: 1000;
-                border-radius: 5px;
-                overflow: hidden;
-            }
-            
-            .dropdown-content a {
-                color: #333;
-                padding: 12px 16px;
-                text-decoration: none;
-                display: block;
-                transition: background-color 0.3s ease;
-            }
-            
-            .dropdown-content a:hover {
-                background-color: #f1f1f1;
-                color: #2c5aa0;
-            }
-            
-            .catalog-container:hover .dropdown-content {
-                display: block;
-            }
+        .navigation {
+            background-color: #2c5aa0;
+            padding: 15px 0;
+            margin-bottom: 30px;
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        }
+        
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .favicon {
+            width: 32px;
+            height: 32px;
+            display: block;
+        }
+        
+        .main-button, .catalog-button, .delivery-button, .login-button, 
+        .register-button, .logout-button {
+            display: inline-block;
+            background-color: #28a745;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: inherit;
+        }
+        
+        .main-button:hover, .catalog-button:hover, .delivery-button:hover,
+        .login-button:hover, .register-button:hover, .logout-button:hover {
+            background-color: #218838;
+        }
+        
+        .catalog-button {
+            position: relative;
+        }
+        
+        .user-greeting {
+            color: white;
+            font-weight: bold;
+            padding: 12px 24px;
+        }
+        
+        .phone-number {
+            color: white;
+            font-weight: bold;
+        }
+        
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 200px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1000;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .dropdown-content a {
+            color: #333;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s ease;
+        }
+        
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+            color: #2c5aa0;
+        }
+        
+        .catalog-container:hover .dropdown-content {
+            display: block;
+        }
 
-            /* Стили для футера */
-            .footer {
-                margin-top: auto;
-                padding: 20px;
-                background-color: #2c5aa0;
-                border-radius: 5px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-            
-            .copyright {
-                color: white;
-                font-size: 0.9em;
-            }
-            
-            .footer a {
-                color: white;
-                text-decoration: none;
-            }
-            
-            .footer a:hover {
-                text-decoration: underline;
-            }
+        .footer {
+            margin-top: auto;
+            padding: 20px;
+            background-color: #2c5aa0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .copyright {
+            color: white;
+            font-size: 0.9em;
+        }
+        
+        .footer a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
 
-            /* Стили для формы выхода */
-            .logout-form {
-                display: inline;
-                margin: 0;
-                padding: 0;
-            }
-            
-            .logout-button {
-                display: inline-block;
-                background-color: #28a745;
-                color: white;
-                padding: 12px 24px;
-                text-decoration: none;
-                border-radius: 5px;
-                font-weight: bold;
-                border: none;
-                cursor: pointer;
-                transition: background-color 0.3s ease;
-                font-family: inherit;
-                font-size: inherit;
-            }
-            
-            .logout-button:hover {
-                background-color: #218838;
-            }
-        </style>
-    </head>
+        .logout-form {
+            display: inline;
+            margin: 0;
+            padding: 0;
+        }
 
-    <body>
-        <div class="content-wrapper">
-            <!-- Навигация с кнопкой каталога -->
-            <div class="navigation">
-                <div class="nav-container">
-                    <div class="nav-left">
-                        <!-- Фавикон слева от кнопки Главная -->
-                        <img src="{% static 'products/images/favicon.ico' %}" alt="Фавикон" class="favicon">
-                        
-                        <!-- Кнопка Главная -->
-                        <a href="{% url 'index' %}" class="main-button">
-                            Главная
-                        </a>
-                        
-                        <div class="catalog-container" style="display: inline-block;">
-                            <div class="catalog-button">Каталог ▼</div>
-                            <div class="dropdown-content">
-                                <a href="{% url 'coffee_list' %}">Кофе</a>
-                                <a href="{% url 'tea_list' %}">Чай</a>
-                                <a href="{% url 'syrup_list' %}">Сиропы</a>
-                            </div>
+        /* Новые стили для формы поиска */
+        .search-form {
+            display: flex;
+            align-items: center;
+        }
+        
+        .search-input-group {
+            display: flex;
+            border-radius: 5px;
+            overflow: hidden;
+            background-color: white;
+        }
+        
+        .search-input {
+            padding: 8px 12px;
+            border: 1px solid #28a745;
+            border-right: none;
+            outline: none;
+            min-width: 200px;
+            font-size: 14px;
+        }
+        
+        .search-input:focus {
+            box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.25);
+        }
+        
+        .search-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #28a745;
+            color: white;
+            padding: 8px 12px;
+            border: 1px solid #28a745;
+            border-left: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .search-button:hover {
+            background-color: #218838;
+        }
+        
+        .search-icon {
+            font-size: 1em;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content-wrapper">
+        <!-- Навигация с кнопкой каталога -->
+        <div class="navigation">
+            <div class="nav-container">
+                <div class="nav-left">
+                    <!-- Фавикон слева от кнопки Главная -->
+                    <img src="{% static 'products/images/favicon.ico' %}" alt="Фавикон" class="favicon">
+                    
+                    <!-- Кнопка Главная -->
+                    <a href="{% url 'index' %}" class="main-button">
+                        Главная
+                    </a>
+                    
+                    <div class="catalog-container" style="display: inline-block;">
+                        <div class="catalog-button">Каталог ▼</div>
+                        <div class="dropdown-content">
+                            <a href="{% url 'coffee_list' %}">Кофе</a>
+                            <a href="{% url 'tea_list' %}">Чай</a>
+                            <a href="{% url 'syrup_list' %}">Сиропы</a>
                         </div>
-                        
-                        <!-- Кнопка Доставка и оплата -->
-                        <a href="{% url 'delivery_info' %}" class="delivery-button">
-                            Доставка и оплата
-                        </a>
                     </div>
                     
-                    <div class="nav-right">
-                        <!-- Номер телефона -->
-                        <div class="phone-number">+375 (33) 123-45-67</div>
-                        
-                        <!-- Кнопка Войти / Приветствие -->
-                        {% if user.is_authenticated %}
-                            <div class="user-greeting">Hello, {{ user.username }}</div>
-                            <form method="post" action="{% url 'users:logout' %}" class="logout-form">
-                                {% csrf_token %}
-                                <input type="hidden" name="next" value="{% url 'index' %}">
-                                <button type="submit" class="logout-button">Выйти</button>
-                            </form>
-                        {% else %}
-                            <a href="{% url 'users:login' %}" class="login-button">Войти</a>
-                            <a href="{% url 'users:register' %}" class="register-button">Регистрация</a>
-                        {% endif %}
-                    </div>
+                    <!-- Кнопка Доставка и оплата -->
+                    <a href="{% url 'delivery_info' %}" class="delivery-button">
+                        Доставка и оплата
+                    </a>
+                </div>
+                
+                <div class="nav-right">
+                    <!-- Номер телефона -->
+                    <div class="phone-number">+375 (33) 123-45-67</div>
+                    
+                    <!-- Форма поиска -->
+                    <form class="search-form" action="{% url 'product_search' %}" method="get">
+                        <div class="search-input-group">
+                            <input type="search" name="q" class="search-input" placeholder="Поиск кофе, чая, сиропов..." aria-label="Поиск" value="{{ request.GET.q }}">
+                            <button type="submit" class="search-button">
+                                <i class="bi bi-search search-icon"></i>
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <!-- Кнопка Войти / Приветствие -->
+                    {% if user.is_authenticated %}
+                        <div class="user-greeting">Hello, {{ user.username }}</div>
+                        <form method="post" action="{% url 'users:logout' %}" class="logout-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{% url 'index' %}">
+                            <button type="submit" class="logout-button">Выйти</button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'users:login' %}" class="login-button">Войти</a>
+                        <a href="{% url 'users:register' %}" class="register-button">Регистрация</a>
+                    {% endif %}
                 </div>
             </div>
+        </div>
 
-            <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; flex: 1;">
-                {% block content %}
-                {% endblock %}
-            </div>
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; flex: 1;">
+            {% block content %}
+            {% endblock %}
         </div>
-        
-        <!-- Футер -->
-        <div class="footer">
-            <div class="copyright">© 2025 Fun Coffee, Все права защищены</div>
-            <div>
-                <a href="{% url 'coffee_list' %}">Весь каталог кофе</a> | 
-                <a href="{% url 'tea_list' %}">Весь каталог чая</a> | 
-                <a href="{% url 'syrup_list' %}">Весь каталог сиропов</a>
-            </div>
-        </div>
+    </div>
     
-    </body>
+    <!-- Футер -->
+    <div class="footer">
+        <div class="copyright">© 2025 Fun Coffee, Все права защищены</div>
+        <div>
+            <a href="{% url 'coffee_list' %}">Весь каталог кофе</a> | 
+            <a href="{% url 'tea_list' %}">Весь каталог чая</a> | 
+            <a href="{% url 'syrup_list' %}">Весь каталог сиропов</a>
+        </div>
+    </div>
+
+</body>
 </html>

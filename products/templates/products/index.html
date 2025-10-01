@@ -19,6 +19,22 @@
         box-sizing: border-box;
         aspect-ratio: 1/1;
         overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .product-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .product-title {
+        color: #2c5aa0;
+        text-decoration: none;
+    }
+    
+    .product-title:hover {
+        text-decoration: underline;
+        color: #1e3d6f;
     }
     
     .section-title {
@@ -73,7 +89,11 @@
             {% for coffee in coffees %}
                 <div class="product-item">
                     <span class="product-type">Кофе</span>
-                    <h3>{{ coffee.name }}</h3>
+                    <h3>
+                        <a href="{% url 'coffee_detail' coffee.pk %}" class="product-title">
+                            {{ coffee.name }}
+                        </a>
+                    </h3>
                     <p>{{ coffee.description }}</p>
                     
                     <div class="characteristics">
@@ -112,7 +132,11 @@
             {% for tea in teas %}
                 <div class="product-item">
                     <span class="product-type">Чай</span>
-                    <h3>{{ tea.name }}</h3>
+                    <h3>
+                        <a href="{% url 'tea_detail' tea.pk %}" class="product-title">
+                            {{ tea.name }}
+                        </a>
+                    </h3>
                     <p>{{ tea.description }}</p>
                     
                     <div class="characteristics">
@@ -144,7 +168,11 @@
             {% for syrup in syrups %}
                 <div class="product-item">
                     <span class="product-type">Сироп</span>
-                    <h3>{{ syrup.name }}</h3>
+                    <h3>
+                        <a href="{% url 'syrup_detail' syrup.pk %}" class="product-title">
+                            {{ syrup.name }}
+                        </a>
+                    </h3>
                     <p>{{ syrup.description }}</p>
                     
                     <div class="characteristics">

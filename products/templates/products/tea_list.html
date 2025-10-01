@@ -19,6 +19,19 @@
         box-sizing: border-box;
         aspect-ratio: 1/1;
         overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .tea-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .tea-title {
+        color: #2c5aa0;
+        text-decoration: none;
+    }
+    .tea-title:hover {
+        text-decoration: underline;
+        color: #1e3d6f;
     }
     .characteristics {
         color: #666;
@@ -36,7 +49,11 @@
     <div class="tea-list">
         {% for tea in teas %}
             <div class="tea-item">
-                <h2>{{ tea.name }}</h2>
+                <h2>
+                    <a href="{% url 'tea_detail' tea.pk %}" class="tea-title">
+                        {{ tea.name }}
+                    </a>
+                </h2>
                 <p>{{ tea.description }}</p>
                 
                 <div class="characteristics">

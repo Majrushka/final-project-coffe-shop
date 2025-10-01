@@ -4,7 +4,6 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Product(models.Model):
     """Базовая модель продукта"""
-    
     name = models.CharField(max_length=100, verbose_name='Название')
     description = models.TextField(blank=True, verbose_name='Описание', default='')
     is_available = models.BooleanField(default=True, verbose_name='В наличии')
