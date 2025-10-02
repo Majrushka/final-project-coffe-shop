@@ -1,33 +1,65 @@
-{% if results %}
-    <div class="products-grid">
-        {% for product in results %}
-            <div class="product-item">
-                <!-- Исправленная логика определения типа продукта -->
-                {% if product in coffees %}
-                    <a href="{% url 'coffee_detail' product.pk %}">
-                        <h3>{{ product.name }}</h3>
-                    </a>
-                    <p>Кофе</p>
-                {% elif product in teas %}
-                    <a href="{% url 'tea_detail' product.pk %}">
-                        <h3>{{ product.name }}</h3>
-                    </a>
-                    <p>Чай</p>
-                {% elif product in syrups %}
-                    <a href="{% url 'syrup_detail' product.pk %}">
-                        <h3>{{ product.name }}</h3>
-                    </a>
-                    <p>Сироп</p>
-                {% endif %}
-                
-                {% if product.is_available %}
-                    <span class="available">В наличии</span>
-                {% else %}
-                    <span class="not-available">Нет в наличии</span>
-                {% endif %}
-            </div>
-        {% endfor %}
-    </div>
-{% else %}
-    <p>Ничего не найдено.</p>
-{% endif %}
+{% extends 'products/base.html' %}
+
+{% block content %}
+<div class="search-results">
+    <h1>Результаты поиска</h1>
+
+    {% if results %}
+        <!-- Автоматическое перенаправление обрабатывается во views -->
+        <p>Найдено товаров: {{ results|length }}</p>
+        <p>Если найден один товар, вы будете автоматически перенаправлены на его страницу.</p>
+    {% else %}
+        {% if query %}
+            <p>По вашему запросу "{{ query }}" ничего не найдено.</p>
+            <p>Попробуйте изменить поисковый запрос или посмотрите наши <a href="{% url 'coffee_list' %}">кофе</a>, <a href="{% url 'tea_list' %}">чаи</a> или <a href="{% url 'syrup_list' %}">сиропы</a>.</p>
+        {% else %}
+            <p>Введите поисковый запрос в форме выше.</p>
+        {% endif %}
+    {% endif %}
+</div>
+
+<style>
+.search-results {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.product-item {
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.product-item h3 {
+    margin-top: 0;
+    color: #2c5aa0;
+}
+
+.product-item a {
+    text-decoration: none;
+}
+
+.product-item a:hover h3 {
+    color: #28a745;
+}
+
+.available {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.not-available {
+    color: #dc3545;
+    font-weight: bold;
+}
+</style>
+{% endblock %}

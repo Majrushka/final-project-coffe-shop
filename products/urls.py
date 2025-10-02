@@ -3,6 +3,7 @@ from django.urls import path
 from .views import coffee_list, tea_list, syrup_list, delivery_info, product_search, coffee_detail, tea_detail, syrup_detail
 from . import views
 
+
 urlpatterns = [
     path('', views.index, name='index'),   
     path('coffee/', coffee_list, name='coffee_list'),

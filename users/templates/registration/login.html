@@ -6,7 +6,7 @@
         <p>Неправильное имя пользователя или пароль. Попробуйте еще раз.</p>
     {% endif %}
 
-    <form method="post" action="{% url 'users:login' %}">
+    <form method="post" action="{% url 'login' %}">
         {% csrf_token %}
         {{ form.as_p }}
 

@@ -41,6 +41,48 @@
         color: #2c5aa0;
         font-weight: bold;
     }
+    
+    /* Стили для кнопок выбора веса */
+    .weight-selector {
+        margin: 10px 0;
+    }
+    
+    .weight-buttons {
+        display: flex;
+        gap: 8px;
+        margin: 8px 0;
+    }
+    
+    .weight-btn {
+        padding: 6px 12px;
+        border: 2px solid #2c5aa0;
+        background-color: white;
+        color: #2c5aa0;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.9em;
+    }
+    
+    .weight-btn:hover {
+        background-color: #f0f5ff;
+    }
+    
+    .weight-btn.active {
+        background-color: #2c5aa0;
+        color: white;
+    }
+    
+    .selected-price {
+        font-size: 1.2em;
+        font-weight: bold;
+        color: #2c5aa0;
+        margin: 10px 0;
+        padding: 8px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+        text-align: center;
+    }
 </style>
 
 <h1>Каталог чая</h1>
@@ -59,13 +101,21 @@
                 <div class="characteristics">
                     <p><strong>Тип:</strong> {{ tea.get_tea_type_display }}</p>
                 </div>
-                
-                <div class="prices">
-                    <p><strong>Цены:</strong></p>
-                    <ul>
-                        <li>100 г: {{ tea.price_100g }} руб.</li>
-                        <li>500 г: {{ tea.price_500g }} руб.</li>
-                    </ul>
+
+                <!-- Блок выбора веса для чая -->
+                <div class="weight-selector">
+                    <strong>Выберите вес:</strong>
+                    <div class="weight-buttons">
+                        <button class="weight-btn active" data-weight="100" data-price="{{ tea.price_100g }}">
+                            100 г
+                        </button>
+                        <button class="weight-btn" data-weight="500" data-price="{{ tea.price_500g }}">
+                            500 г
+                        </button>
+                    </div>
+                    <div class="selected-price">
+                        Цена: {{ tea.price_100g }} руб.
+                    </div>
                 </div>
                 
                 <p><em>В наличии: {% if tea.is_available %}Да{% else %}Нет{% endif %}</em></p>
@@ -75,4 +125,35 @@
 {% else %}
     <p>К сожалению, чая временно нет в наличии.</p>
 {% endif %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Находим все кнопки выбора веса
+        const weightButtons = document.querySelectorAll('.weight-btn');
+        
+        // Добавляем обработчик события для каждой кнопки
+        weightButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Находим родительский контейнер продукта
+                const productItem = this.closest('.tea-item');
+                
+                // Убираем активный класс у всех кнопок в этом продукте
+                const allButtonsInProduct = productItem.querySelectorAll('.weight-btn');
+                allButtonsInProduct.forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Добавляем активный класс к нажатой кнопке
+                this.classList.add('active');
+                
+                // Получаем цену из data-атрибута
+                const price = this.getAttribute('data-price');
+                
+                // Находим элемент для отображения цены и обновляем его
+                const priceDisplay = productItem.querySelector('.selected-price');
+                priceDisplay.textContent = `Цена: ${price} руб.`;
+            });
+        });
+    });
+</script>
 {% endblock content %}

@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 # from django.http import HttpResponse
 from django.db.models import Q
 from .models import Coffee, Tea, Syrup
@@ -46,26 +46,33 @@ def syrup_detail(request, pk):
     syrup = get_object_or_404(Syrup, pk=pk)
     return render(request, 'products/syrup_detail.html', {'syrup': syrup})
 
-
 def product_search(request):
-    query = request.GET.get('q', '')
+    query = request.GET.get('q', '').strip().title()
     results = []
     
-    all_coffees = Coffee.objects.all()
-    all_teas = Tea.objects.all()
-    all_syrups = Syrup.objects.all()
-    
     if query:
-        coffee_results = all_coffees.filter(Q(name__icontains=query))
-        tea_results = all_teas.filter(Q(name__icontains=query))
-        syrup_results = all_syrups.filter(Q(name__icontains=query))
+        coffee_results = Coffee.objects.filter(name__iexact=query)
+        tea_results = Tea.objects.filter(name__iexact=query)
+        syrup_results = Syrup.objects.filter(name__iexact=query)
         
         results = list(coffee_results) + list(tea_results) + list(syrup_results)
+        
+        if not results:
+            coffee_results = Coffee.objects.filter(name__icontains=query)
+            tea_results = Tea.objects.filter(name__icontains=query)
+            syrup_results = Syrup.objects.filter(name__icontains=query)
+            results = list(coffee_results) + list(tea_results) + list(syrup_results)
+        
+        if len(results) == 1:
+            product = results[0]
+            if isinstance(product, Coffee):
+                return redirect('coffee_detail', pk=product.pk)
+            elif isinstance(product, Tea):
+                return redirect('tea_detail', pk=product.pk)
+            elif isinstance(product, Syrup):
+                return redirect('syrup_detail', pk=product.pk)
     
     return render(request, 'products/search_results.html', {
         'results': results,
         'query': query,
-        'coffees': all_coffees,  
-        'teas': all_teas,        
-        'syrups': all_syrups,    
     })

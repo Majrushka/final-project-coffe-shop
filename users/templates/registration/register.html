@@ -1,13 +1,26 @@
 {% extends "products/base.html" %}
 
 {% block content %}
-
-    <form method="post" action="{% url 'users:register' %}">
+    <form method="post" action="{% url 'register' %}">
         {% csrf_token %}
         {{ form.as_p }}
+
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <ul>
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
 
         <button name="submit">Регистрация</button>
         <input type="hidden" name="next" value="{% url 'index' %}" />
     </form>
-
 {% endblock content %}

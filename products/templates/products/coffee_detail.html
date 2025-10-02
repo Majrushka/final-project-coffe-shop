@@ -2,24 +2,158 @@
 <html>
 <head>
     <title>{{ coffee.name }}</title>
+    <style>
+        .coffee-attributes {
+            margin: 1em 0;
+        }
+        .attribute {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5em;
+        }
+        .attribute-name {
+            min-width: 120px;
+        }
+        .rating-stars {
+            display: flex;
+            gap: 2px;
+            color: #e0e0e0;
+            font-size: 1.2em;
+        }
+        .rating-stars .filled {
+            color: #ffc107;
+        }
+        
+        /* Стили для кнопок выбора веса */
+        .weight-selector {
+            margin: 15px 0;
+        }
+        
+        .weight-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .weight-btn {
+            padding: 8px 16px;
+            border: 2px solid #2c5aa0;
+            background-color: white;
+            color: #2c5aa0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1em;
+        }
+        
+        .weight-btn:hover {
+            background-color: #f0f5ff;
+        }
+        
+        .weight-btn.active {
+            background-color: #2c5aa0;
+            color: white;
+        }
+        
+        .selected-price {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2c5aa0;
+            margin: 15px 0;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
     <h1>{{ coffee.name }}</h1>
     <p><strong>Тип:</strong> {{ coffee.get_coffee_type_display }}</p>
     <p><strong>Описание:</strong> {{ coffee.description }}</p>
-    <p><strong>Цены:</strong></p>
-    <ul>
-        <li>250 г: {{ coffee.price_250g }} руб.</li>
-        <li>500 г: {{ coffee.price_500g }} руб.</li>
-        <li>1000 г: {{ coffee.price_1000g }} руб.</li>
-    </ul>
+    
     <p><strong>Характеристики вкуса:</strong></p>
-    <ul>
-        <li>Кислотность: {{ coffee.acidity }}/5</li>
-        <li>Горчинка: {{ coffee.bitterness }}/5</li>
-        <li>Насыщенность: {{ coffee.intensity }}/5</li>
+    <ul class="coffee-attributes">
+        <li class="attribute">
+            <span class="attribute-name">Кислотность:</span>
+            <div class="rating-stars">
+                {% for i in "12345" %}
+                    <span class="{% if coffee.acidity >= forloop.counter %}filled{% endif %}">★</span>
+                {% endfor %}
+            </div>
+            <span style="margin-left: 10px;">({{ coffee.acidity }}/5)</span>
+        </li>
+        <li class="attribute">
+            <span class="attribute-name">Горчинка:</span>
+            <div class="rating-stars">
+                {% for i in "12345" %}
+                    <span class="{% if coffee.bitterness >= forloop.counter %}filled{% endif %}">★</span>
+                {% endfor %}
+            </div>
+            <span style="margin-left: 10px;">({{ coffee.bitterness }}/5)</span>
+        </li>
+        <li class="attribute">
+            <span class="attribute-name">Насыщенность:</span>
+            <div class="rating-stars">
+                {% for i in "12345" %}
+                    <span class="{% if coffee.intensity >= forloop.counter %}filled{% endif %}">★</span>
+                {% endfor %}
+            </div>
+            <span style="margin-left: 10px;">({{ coffee.intensity }}/5)</span>
+        </li>
     </ul>
+
+    <!-- Блок выбора веса для кофе -->
+    <div class="weight-selector">
+        <strong>Выберите вес:</strong>
+        <div class="weight-buttons">
+            <button class="weight-btn active" data-weight="250" data-price="{{ coffee.price_250g }}">
+                250 г
+            </button>
+            <button class="weight-btn" data-weight="500" data-price="{{ coffee.price_500g }}">
+                500 г
+            </button>
+            <button class="weight-btn" data-weight="1000" data-price="{{ coffee.price_1000g }}">
+                1000 г
+            </button>
+        </div>
+        <div class="selected-price">
+            Цена: {{ coffee.price_250g }} руб.
+        </div>
+    </div>
+    
     <p><strong>Наличие:</strong> {% if coffee.is_available %}В наличии{% else %}Нет в наличии{% endif %}</p>
     <a href="{% url 'index' %}">Назад к списку продуктов</a>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Находим все кнопки выбора веса
+            const weightButtons = document.querySelectorAll('.weight-btn');
+            
+            // Добавляем обработчик события для каждой кнопки
+            weightButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Находим родительский контейнер
+                    const container = this.closest('.weight-selector');
+                    
+                    // Убираем активный класс у всех кнопок
+                    const allButtons = container.querySelectorAll('.weight-btn');
+                    allButtons.forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    // Добавляем активный класс к нажатой кнопке
+                    this.classList.add('active');
+                    
+                    // Получаем цену из data-атрибута
+                    const price = this.getAttribute('data-price');
+                    
+                    // Находим элемент для отображения цены и обновляем его
+                    const priceDisplay = container.querySelector('.selected-price');
+                    priceDisplay.textContent = `Цена: ${price} руб.`;
+                });
+            });
+        });
+    </script>
 </body>
 </html>
