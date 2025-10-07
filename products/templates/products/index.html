@@ -27,6 +27,35 @@
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
     
+    /* Стили для изображения внутри квадрата */
+    .product-image {
+        width: 240px;
+        height: 240px;
+        border-radius: 8px;
+        object-fit: cover;
+        float: right;
+        margin-left: 15px;
+        margin-bottom: 10px;
+    }
+    
+    .image-placeholder {
+        width: 240px;
+        height: 240px;
+        background-color: #f5f5f5;
+        border: 2px dashed #ddd;
+        border-radius: 8px;
+        float: right;
+        margin-left: 15px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #999;
+        font-style: italic;
+        font-size: 0.8em;
+        text-align: center;
+    }
+    
     .product-title {
         color: #2c5aa0;
         text-decoration: none;
@@ -131,6 +160,34 @@
         border-radius: 4px;
         text-align: center;
     }
+
+    /* Стили для кнопки "В корзину" */
+    .add-to-cart-btn {
+        background-color: #28a745; /* Зеленый цвет как у "В наличии" */
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1em;
+        font-weight: bold;
+        transition: all 0.2s;
+        display: block;
+        margin: 10px auto;
+        width: 80%;
+        text-align: center;
+    }
+    
+    .add-to-cart-btn:hover {
+        background-color: #218838;
+        transform: translateY(-1px);
+    }
+    
+    .add-to-cart-btn:disabled {
+        background-color: #6c757d;
+        cursor: not-allowed;
+        transform: none;
+    }
 </style>
 
 <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
@@ -147,6 +204,16 @@
                             {{ coffee.name }}
                         </a>
                     </h3>
+                    
+                    <!-- Изображение кофе -->
+                    {% if coffee.image %}
+                        <img src="{{ coffee.image.url }}" alt="{{ coffee.name }}" class="product-image">
+                    {% else %}
+                        <div class="image-placeholder">
+                            Нет изображения
+                        </div>
+                    {% endif %}
+                    
                     <p>{{ coffee.description }}</p>
                     
                     <div class="characteristics">
@@ -202,6 +269,11 @@
                     <p class="{% if coffee.is_available %}availability{% else %}not-available{% endif %}">
                         <strong>В наличии:</strong> {% if coffee.is_available %}Да{% else %}Нет{% endif %}
                     </p>
+                    
+                    <!-- Кнопка "В корзину" -->
+                    <button class="add-to-cart-btn" {% if not coffee.is_available %}disabled{% endif %}>
+                        В корзину
+                    </button>
                 </div>
             {% endfor %}
         </div>
@@ -220,6 +292,16 @@
                             {{ tea.name }}
                         </a>
                     </h3>
+                    
+                    <!-- Изображение чая -->
+                    {% if tea.image %}
+                        <img src="{{ tea.image.url }}" alt="{{ tea.name }}" class="product-image">
+                    {% else %}
+                        <div class="image-placeholder">
+                            Нет изображения
+                        </div>
+                    {% endif %}
+                    
                     <p>{{ tea.description }}</p>
                     
                     <div class="characteristics">
@@ -245,6 +327,11 @@
                     <p class="{% if tea.is_available %}availability{% else %}not-available{% endif %}">
                         <strong>В наличии:</strong> {% if tea.is_available %}Да{% else %}Нет{% endif %}
                     </p>
+                    
+                    <!-- Кнопка "В корзину" -->
+                    <button class="add-to-cart-btn" {% if not tea.is_available %}disabled{% endif %}>
+                        В корзину
+                    </button>
                 </div>
             {% endfor %}
         </div>
@@ -252,7 +339,7 @@
         <p>Чая временно нет в наличии.</p>
     {% endif %}
 
-    <!-- Сиропы (без изменений) -->
+    <!-- Сиропы -->
     <h2 class="section-title">Сиропы ({{ syrups|length }})</h2>
     {% if syrups %}
         <div class="products-container">
@@ -263,6 +350,16 @@
                             {{ syrup.name }}
                         </a>
                     </h3>
+                    
+                    <!-- Изображение сиропа -->
+                    {% if syrup.image %}
+                        <img src="{{ syrup.image.url }}" alt="{{ syrup.name }}" class="product-image">
+                    {% else %}
+                        <div class="image-placeholder">
+                            Нет изображения
+                        </div>
+                    {% endif %}
+                    
                     <p>{{ syrup.description }}</p>
                     
                     <div class="characteristics">
@@ -276,6 +373,11 @@
                     <p class="{% if syrup.is_available %}availability{% else %}not-available{% endif %}">
                         <strong>В наличии:</strong> {% if syrup.is_available %}Да{% else %}Нет{% endif %}
                     </p>
+                    
+                    <!-- Кнопка "В корзину" -->
+                    <button class="add-to-cart-btn" {% if not syrup.is_available %}disabled{% endif %}>
+                        В корзину
+                    </button>
                 </div>
             {% endfor %}
         </div>

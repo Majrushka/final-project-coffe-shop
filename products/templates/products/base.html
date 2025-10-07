@@ -247,7 +247,7 @@
                     
                     <!-- Кнопка Войти / Приветствие -->
                     {% if user.is_authenticated %}
-                        <div class="user-greeting">Hello, {{ user.username }}</div>
+                        <div class="user-greeting">Привет, {{ user.username }}!</div>
                         <form method="post" action="{% url 'logout' %}" class="logout-form">
                             {% csrf_token %}
                             <input type="hidden" name="next" value="{% url 'index' %}">

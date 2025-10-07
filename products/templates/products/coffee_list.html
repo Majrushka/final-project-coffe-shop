@@ -12,7 +12,7 @@
         border: 1px solid #ddd;
         padding: 15px;
         border-radius: 5px;
-        width: calc(37.5% - 10px);
+        width: calc(50% - 10px);
         box-sizing: border-box;
         aspect-ratio: 1/1;
         overflow: hidden;
@@ -22,6 +22,36 @@
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
+    
+    /* Стили для изображения внутри квадрата - УВЕЛИЧЕНО В 2 РАЗА */
+    .coffee-image {
+        width: 240px;  /* 120px * 2 = 240px */
+        height: 240px; /* 120px * 2 = 240px */
+        border-radius: 8px;
+        object-fit: cover;
+        float: right;
+        margin-left: 15px;
+        margin-bottom: 10px;
+    }
+    
+    .image-placeholder {
+        width: 240px;
+        height: 240px;
+        background-color: #f5f5f5;
+        border: 2px dashed #ddd;
+        border-radius: 8px;
+        float: right;
+        margin-left: 15px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #999;
+        font-style: italic;
+        font-size: 0.8em;
+        text-align: center;
+    }
+    
     .coffee-title {
         color: #2c5aa0;
         text-decoration: none;
@@ -104,6 +134,49 @@
         border-radius: 4px;
         text-align: center;
     }
+
+    /* Стили для пагинации */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 30px 0;
+        gap: 10px;
+    }
+
+    .pagination a, .pagination span {
+        padding: 8px 16px;
+        text-decoration: none;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        color: #2c5aa0;
+        transition: all 0.2s;
+    }
+
+    .pagination a:hover {
+        background-color: #f0f5ff;
+        border-color: #2c5aa0;
+    }
+
+    .pagination .current {
+        background-color: #2c5aa0;
+        color: white;
+        border-color: #2c5aa0;
+    }
+
+    .pagination .disabled {
+        color: #ccc;
+        cursor: not-allowed;
+        border-color: #eee;
+    }
+
+    .step-links {
+        display: flex;
+        gap: 5px;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
 </style>
 
 <h1>Каталог кофе</h1>
@@ -117,6 +190,16 @@
                         {{ coffee.name }}
                     </a>
                 </h2>
+                
+                <!-- Изображение внутри квадрата - УВЕЛИЧЕНО В 2 РАЗА -->
+                {% if coffee.image %}
+                    <img src="{{ coffee.image.url }}" alt="{{ coffee.name }}" class="coffee-image">
+                {% else %}
+                    <div class="image-placeholder">
+                        Нет изображения
+                    </div>
+                {% endif %}
+                
                 <p>{{ coffee.description }}</p>
                 
                 <div class="characteristics">
@@ -173,6 +256,32 @@
             </div>
         {% endfor %}
     </div>
+
+    <!-- Пагинация -->
+    <div class="pagination">
+        <div class="step-links">
+            {% if coffees.has_previous %}
+                <a href="?page=1">&laquo; Первая</a>
+                <a href="?page={{ coffees.previous_page_number }}">Назад</a>
+            {% else %}
+                <span class="disabled">&laquo; Первая</span>
+                <span class="disabled">Назад</span>
+            {% endif %}
+
+            <span class="current">
+                Страница {{ coffees.number }} из {{ coffees.paginator.num_pages }}
+            </span>
+
+            {% if coffees.has_next %}
+                <a href="?page={{ coffees.next_page_number }}">Вперед</a>
+                <a href="?page={{ coffees.paginator.num_pages }}">Последняя &raquo;</a>
+            {% else %}
+                <span class="disabled">Вперед</span>
+                <span class="disabled">Последняя &raquo;</span>
+            {% endif %}
+        </div>
+    </div>
+
 {% else %}
     <p>К сожалению, кофе временно нет в наличии.</p>
 {% endif %}

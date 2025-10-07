@@ -24,6 +24,13 @@ class Coffee(Product):
         (500, '500 г'),
         (1000, '1000 г'),
     ]
+
+    image = models.ImageField(
+        upload_to='coffee_images/',
+        verbose_name='Изображение',
+        blank=True,
+        null=True
+    )
     
     # Специфические характеристики кофе
     coffee_type = models.CharField(
@@ -101,6 +108,13 @@ class Tea(Product):
         (100, '100 г'),
         (500, '500 г'),
     ]
+
+    image = models.ImageField(
+        upload_to='tea_images/',
+        verbose_name='Изображение',
+        blank=True,
+        null=True
+    )
     
     # Специфические характеристики чая
     tea_type = models.CharField(
@@ -153,6 +167,13 @@ class Syrup(Product):
         choices=MANUFACTURER_CHOICES,
         verbose_name='Производитель',
         default='manufacturer1'
+    )
+
+    image = models.ImageField(
+        upload_to='syrup_images/',
+        verbose_name='Изображение',
+        blank=True,
+        null=True
     )
     
     price = models.DecimalField(

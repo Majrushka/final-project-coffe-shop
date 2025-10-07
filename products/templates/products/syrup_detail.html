@@ -2,13 +2,118 @@
 <html>
 <head>
     <title>{{ syrup.name }}</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        .syrup-container {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+            width: calc(37.5% - 10px); /* Уменьшено на 1/4: 50% - 12.5% = 37.5% */
+            box-sizing: border-box;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 0 auto;
+        }
+        
+        .syrup-container:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        /* Основной контейнер для контента и изображения */
+        .content-wrapper {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        
+        .text-content {
+            flex: 1;
+        }
+        
+        /* Стили для изображения */
+        .image-section {
+            flex-shrink: 0;
+        }
+        
+        .syrup-image {
+            width: 200px;  /* Уменьшено на 1/4: 267px - 67px = 200px */
+            height: 200px; /* Уменьшено на 1/4: 267px - 67px = 200px */
+            border-radius: 8px;
+            object-fit: cover;
+        }
+        
+        .image-placeholder {
+            width: 200px;
+            height: 200px;
+            background-color: #f5f5f5;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-style: italic;
+        }
+        
+        .price-display {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2c5aa0;
+            margin: 15px 0;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .back-link {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-    <h1>{{ syrup.name }}</h1>
-    <p><strong>Производитель:</strong> {{ syrup.get_manufacturer_display }}</p>
-    <p><strong>Описание:</strong> {{ syrup.description }}</p>
-    <p><strong>Цена:</strong> {{ syrup.price }} руб.</p>
-    <p><strong>Наличие:</strong> {% if syrup.is_available %}В наличии{% else %}Нет в наличии{% endif %}</p>
-    <a href="{% url 'index' %}">Назад к списку продуктов</a>
+    <div class="syrup-container">
+        <h1>{{ syrup.name }}</h1>
+        
+        <div class="content-wrapper">
+            <div class="text-content">
+                <p><strong>Производитель:</strong> {{ syrup.get_manufacturer_display }}</p>
+                <p><strong>Описание:</strong> {{ syrup.description }}</p>
+            </div>
+            
+            <!-- Блок с изображением -->
+            <div class="image-section">
+                {% if syrup.image %}
+                    <img src="{{ syrup.image.url }}" alt="{{ syrup.name }}" class="syrup-image">
+                {% else %}
+                    <div class="image-placeholder">
+                        Изображение отсутствует
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="price-display">
+            Цена: {{ syrup.price }} руб.
+        </div>
+        
+        <p><strong>Наличие:</strong> {% if syrup.is_available %}В наличии{% else %}Нет в наличии{% endif %}</p>
+    </div>
+    
+    <div class="back-link">
+        <a href="{% url 'index' %}">Назад к списку продуктов</a>
+    </div>
 </body>
 </html>

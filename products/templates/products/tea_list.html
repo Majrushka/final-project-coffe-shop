@@ -15,7 +15,7 @@
         border: 1px solid #ddd;
         padding: 15px;
         border-radius: 5px;
-        width: calc(37.5% - 10px);
+        width: calc(50% - 10px);
         box-sizing: border-box;
         aspect-ratio: 1/1;
         overflow: hidden;
@@ -25,6 +25,36 @@
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
+    
+    /* Стили для изображения внутри квадрата */
+    .tea-image {
+        width: 240px;  /* 120px * 2 = 240px */
+        height: 240px; /* 120px * 2 = 240px */
+        border-radius: 8px;
+        object-fit: cover;
+        float: right;
+        margin-left: 15px;
+        margin-bottom: 10px;
+    }
+    
+    .image-placeholder {
+        width: 240px;
+        height: 240px;
+        background-color: #f5f5f5;
+        border: 2px dashed #ddd;
+        border-radius: 8px;
+        float: right;
+        margin-left: 15px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #999;
+        font-style: italic;
+        font-size: 0.8em;
+        text-align: center;
+    }
+    
     .tea-title {
         color: #2c5aa0;
         text-decoration: none;
@@ -96,6 +126,16 @@
                         {{ tea.name }}
                     </a>
                 </h2>
+                
+                <!-- Изображение внутри квадрата -->
+                {% if tea.image %}
+                    <img src="{{ tea.image.url }}" alt="{{ tea.name }}" class="tea-image">
+                {% else %}
+                    <div class="image-placeholder">
+                        Нет изображения
+                    </div>
+                {% endif %}
+                
                 <p>{{ tea.description }}</p>
                 
                 <div class="characteristics">

@@ -11,12 +11,32 @@
     {% else %}
         {% if query %}
             <p>По вашему запросу "{{ query }}" ничего не найдено.</p>
-            <p>Попробуйте изменить поисковый запрос или посмотрите наши <a href="{% url 'coffee_list' %}">кофе</a>, <a href="{% url 'tea_list' %}">чаи</a> или <a href="{% url 'syrup_list' %}">сиропы</a>.</p>
+            <p>Попробуйте изменить поисковый запрос или посмотрите наши <a href="{% url 'coffee_list' %}">кофе</a>, <a href="{% url 'tea_list' %}">чай</a> или <a href="{% url 'syrup_list' %}">сиропы</a>.</p>
         {% else %}
             <p>Введите поисковый запрос в форме выше.</p>
         {% endif %}
     {% endif %}
 </div>
+
+<!-- Блок для автоматического перенаправления -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const query = urlParams.get('q');
+    
+    if (query) {
+        const lowerQuery = query.toLowerCase();
+        
+        if (['кофе', 'coffee'].includes(lowerQuery)) {
+            window.location.href = "{% url 'coffee_list' %}";
+        } else if (['чай', 'чаи', 'tea'].includes(lowerQuery)) {
+            window.location.href = "{% url 'tea_list' %}";
+        } else if (['сироп', 'сиропы', 'syrup'].includes(lowerQuery)) {
+            window.location.href = "{% url 'syrup_list' %}";
+        }
+    }
+});
+</script>
 
 <style>
 .search-results {

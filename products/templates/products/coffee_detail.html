@@ -3,6 +3,69 @@
 <head>
     <title>{{ coffee.name }}</title>
     <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        .coffee-container {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+            width: calc(50% - 10px);
+            box-sizing: border-box;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 0 auto;
+        }
+        
+        .coffee-container:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        /* Основной контейнер для контента и изображения */
+        .content-wrapper {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        
+        .text-content {
+            flex: 1;
+        }
+        
+        /* Стили для изображения */
+        .image-section {
+            flex-shrink: 0;
+        }
+        
+        .coffee-image {
+            width: 400px;
+            height: 400px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+        
+        .image-placeholder {
+            width: 400px;
+            height: 400px;
+            background-color: #f5f5f5;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-style: italic;
+        }
+        
         .coffee-attributes {
             margin: 1em 0;
         }
@@ -65,65 +128,91 @@
             border-radius: 4px;
             text-align: center;
         }
+        
+        .back-link {
+            margin-top: 20px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-    <h1>{{ coffee.name }}</h1>
-    <p><strong>Тип:</strong> {{ coffee.get_coffee_type_display }}</p>
-    <p><strong>Описание:</strong> {{ coffee.description }}</p>
-    
-    <p><strong>Характеристики вкуса:</strong></p>
-    <ul class="coffee-attributes">
-        <li class="attribute">
-            <span class="attribute-name">Кислотность:</span>
-            <div class="rating-stars">
-                {% for i in "12345" %}
-                    <span class="{% if coffee.acidity >= forloop.counter %}filled{% endif %}">★</span>
-                {% endfor %}
+    <div class="coffee-container">
+        <h1>{{ coffee.name }}</h1>
+        
+        <div class="content-wrapper">
+            <div class="text-content">
+                <p><strong>Тип:</strong> {{ coffee.get_coffee_type_display }}</p>
+                <p><strong>Описание:</strong> {{ coffee.description }}</p>
+                
+                <p><strong>Характеристики вкуса:</strong></p>
+                <ul class="coffee-attributes">
+                    <li class="attribute">
+                        <span class="attribute-name">Кислотность:</span>
+                        <div class="rating-stars">
+                            {% for i in "12345" %}
+                                <span class="{% if coffee.acidity >= forloop.counter %}filled{% endif %}">★</span>
+                            {% endfor %}
+                        </div>
+                        <span style="margin-left: 10px;">({{ coffee.acidity }}/5)</span>
+                    </li>
+                    <li class="attribute">
+                        <span class="attribute-name">Горчинка:</span>
+                        <div class="rating-stars">
+                            {% for i in "12345" %}
+                                <span class="{% if coffee.bitterness >= forloop.counter %}filled{% endif %}">★</span>
+                            {% endfor %}
+                        </div>
+                        <span style="margin-left: 10px;">({{ coffee.bitterness }}/5)</span>
+                    </li>
+                    <li class="attribute">
+                        <span class="attribute-name">Насыщенность:</span>
+                        <div class="rating-stars">
+                            {% for i in "12345" %}
+                                <span class="{% if coffee.intensity >= forloop.counter %}filled{% endif %}">★</span>
+                            {% endfor %}
+                        </div>
+                        <span style="margin-left: 10px;">({{ coffee.intensity }}/5)</span>
+                    </li>
+                </ul>
             </div>
-            <span style="margin-left: 10px;">({{ coffee.acidity }}/5)</span>
-        </li>
-        <li class="attribute">
-            <span class="attribute-name">Горчинка:</span>
-            <div class="rating-stars">
-                {% for i in "12345" %}
-                    <span class="{% if coffee.bitterness >= forloop.counter %}filled{% endif %}">★</span>
-                {% endfor %}
+            
+            <!-- Блок с изображением -->
+            <div class="image-section">
+                {% if coffee.image %}
+                    <img src="{{ coffee.image.url }}" alt="{{ coffee.name }}" class="coffee-image">
+                {% else %}
+                    <div class="image-placeholder">
+                        Изображение отсутствует
+                    </div>
+                {% endif %}
             </div>
-            <span style="margin-left: 10px;">({{ coffee.bitterness }}/5)</span>
-        </li>
-        <li class="attribute">
-            <span class="attribute-name">Насыщенность:</span>
-            <div class="rating-stars">
-                {% for i in "12345" %}
-                    <span class="{% if coffee.intensity >= forloop.counter %}filled{% endif %}">★</span>
-                {% endfor %}
-            </div>
-            <span style="margin-left: 10px;">({{ coffee.intensity }}/5)</span>
-        </li>
-    </ul>
+        </div>
 
-    <!-- Блок выбора веса для кофе -->
-    <div class="weight-selector">
-        <strong>Выберите вес:</strong>
-        <div class="weight-buttons">
-            <button class="weight-btn active" data-weight="250" data-price="{{ coffee.price_250g }}">
-                250 г
-            </button>
-            <button class="weight-btn" data-weight="500" data-price="{{ coffee.price_500g }}">
-                500 г
-            </button>
-            <button class="weight-btn" data-weight="1000" data-price="{{ coffee.price_1000g }}">
-                1000 г
-            </button>
+        <!-- Блок выбора веса для кофе -->
+        <div class="weight-selector">
+            <strong>Выберите вес:</strong>
+            <div class="weight-buttons">
+                <button class="weight-btn active" data-weight="250" data-price="{{ coffee.price_250g }}">
+                    250 г
+                </button>
+                <button class="weight-btn" data-weight="500" data-price="{{ coffee.price_500g }}">
+                    500 г
+                </button>
+                <button class="weight-btn" data-weight="1000" data-price="{{ coffee.price_1000g }}">
+                    1000 г
+                </button>
+            </div>
+            <div class="selected-price">
+                Цена: {{ coffee.price_250g }} руб.
+            </div>
         </div>
-        <div class="selected-price">
-            Цена: {{ coffee.price_250g }} руб.
-        </div>
+        
+        <p><strong>Наличие:</strong> {% if coffee.is_available %}В наличии{% else %}Нет в наличии{% endif %}</p>
     </div>
     
-    <p><strong>Наличие:</strong> {% if coffee.is_available %}В наличии{% else %}Нет в наличии{% endif %}</p>
-    <a href="{% url 'index' %}">Назад к списку продуктов</a>
+    <div class="back-link">
+        <a href="{% url 'index' %}">Назад к списку продуктов</a>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

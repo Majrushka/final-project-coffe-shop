@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
-# from django.http import HttpResponse
 from django.db.models import Q
 from .models import Coffee, Tea, Syrup
+from django.core.paginator import Paginator
 
 # Create your views here.
 
@@ -14,13 +14,15 @@ def index(request):
         'coffees': coffees,
         'teas': teas,
         'syrups': syrups,
-        # 'all_products': list(coffees) + list(teas) + list(syrups),
     }
     
     return render(request, 'products/index.html', context)
 
 def coffee_list(request):
     coffees = Coffee.objects.all().order_by('-is_available')
+    paginator = Paginator(coffees, 4)
+    page_number = request.GET.get('page', 1)
+    coffees = paginator.get_page(page_number)
     return render(request, 'products/coffee_list.html', {"coffees": coffees})
 
 def tea_list(request):
@@ -50,6 +52,15 @@ def product_search(request):
     query = request.GET.get('q', '').strip().title()
     results = []
     
+    if query in ['кофе', 'coffee']:
+        return redirect('coffee_list')
+    elif query in ['чай', 'чаи', 'tea']:
+        return redirect('tea_list')
+    elif query in ['сироп', 'сиропы', 'syrup']:
+        return redirect('syrup_list')
+    
+    results = []
+
     if query:
         coffee_results = Coffee.objects.filter(name__iexact=query)
         tea_results = Tea.objects.filter(name__iexact=query)
