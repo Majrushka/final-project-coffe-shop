@@ -60,7 +60,7 @@
         }
         
         .main-button, .catalog-button, .delivery-button, .login-button, 
-        .register-button, .logout-button {
+        .register-button, .logout-button, .cart-button {
             display: inline-block;
             background-color: #28a745;
             color: white;
@@ -76,7 +76,8 @@
         }
         
         .main-button:hover, .catalog-button:hover, .delivery-button:hover,
-        .login-button:hover, .register-button:hover, .logout-button:hover {
+        .login-button:hover, .register-button:hover, .logout-button:hover,
+        .cart-button:hover {
             background-color: #218838;
         }
         
@@ -199,6 +200,26 @@
         .search-icon {
             font-size: 1em;
         }
+
+        /* Стили для телефона в футере */
+        .footer-phone {
+            color: white;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        /* Стили для бейджа корзины */
+        .cart-badge {
+            background-color: #dc3545;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.8em;
+            margin-left: 5px;
+            min-width: 18px;
+            text-align: center;
+            display: inline-block;
+        }
     </style>
 </head>
 
@@ -232,9 +253,6 @@
                 </div>
                 
                 <div class="nav-right">
-                    <!-- Номер телефона -->
-                    <div class="phone-number">+375 (33) 123-45-67</div>
-                    
                     <!-- Форма поиска -->
                     <form class="search-form" action="{% url 'product_search' %}" method="get">
                         <div class="search-input-group">
@@ -244,6 +262,16 @@
                             </button>
                         </div>
                     </form>
+                    
+                    <!-- Кнопка Корзина (только для авторизованных) -->
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'cart_detail' %}" class="cart-button">
+                            Корзина
+                            {% if cart and cart.total_items > 0 %}
+                                <span class="cart-badge">{{ cart.total_items }}</span>
+                            {% endif %}
+                        </a>
+                    {% endif %}
                     
                     <!-- Кнопка Войти / Приветствие -->
                     {% if user.is_authenticated %}
@@ -270,6 +298,7 @@
     <!-- Футер -->
     <div class="footer">
         <div class="copyright">© 2025 Fun Coffee, Все права защищены</div>
+        <div class="footer-phone">+375 (33) 123-45-67</div>
         <div>
             <a href="{% url 'coffee_list' %}">Весь каталог кофе</a> | 
             <a href="{% url 'tea_list' %}">Весь каталог чая</a> | 

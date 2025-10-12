@@ -1,0 +1,150 @@
+{% extends "products/base.html" %}
+
+{% block content %}
+<style>
+    .success-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 40px 20px;
+        text-align: center;
+    }
+    
+    .success-icon {
+        font-size: 4em;
+        color: #28a745;
+        margin-bottom: 20px;
+    }
+    
+    .success-title {
+        color: #28a745;
+        margin-bottom: 20px;
+    }
+    
+    .order-details {
+        background-color: #f8f9fa;
+        padding: 25px;
+        border-radius: 8px;
+        margin: 30px 0;
+        text-align: left;
+    }
+    
+    .order-info {
+        margin-bottom: 15px;
+    }
+    
+    .order-info strong {
+        color: #2c5aa0;
+    }
+    
+    .order-items {
+        margin: 20px 0;
+    }
+    
+    .order-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .order-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 0;
+        border-top: 2px solid #2c5aa0;
+        font-size: 1.2em;
+        font-weight: bold;
+        color: #2c5aa0;
+    }
+    
+    .btn-continue {
+        display: inline-block;
+        background-color: #28a745;
+        color: white;
+        padding: 12px 30px;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: bold;
+        margin-top: 20px;
+        transition: background-color 0.3s;
+    }
+    
+    .btn-continue:hover {
+        background-color: #218838;
+        color: white;
+        text-decoration: none;
+    }
+    
+    .email-notice {
+        background-color: #d1ecf1;
+        border: 1px solid #bee5eb;
+        border-radius: 4px;
+        padding: 15px;
+        margin: 20px 0;
+        color: #0c5460;
+    }
+</style>
+
+<div class="success-container">
+    <div class="success-icon">✓</div>
+    <h1 class="success-title">Заказ успешно оформлен!</h1>
+    
+    <p>Благодарим вас за покупку в нашем магазине. Ваш заказ принят в обработку.</p>
+    
+    <div class="email-notice">
+        <strong>Информация о заказе отправлена на вашу электронную почту: {{ order.email }}</strong>
+    </div>
+    
+    <div class="order-details">
+        <h3>Детали заказа</h3>
+        
+        <div class="order-info">
+            <strong>Номер заказа:</strong> #{{ order.id }}
+        </div>
+        
+        <div class="order-info">
+            <strong>Дата заказа:</strong> {{ order.created_at|date:"d.m.Y H:i" }}
+        </div>
+        
+        <div class="order-info">
+            <strong>Получатель:</strong> {{ order.first_name }} {{ order.last_name }}
+        </div>
+        
+        <div class="order-info">
+            <strong>Телефон:</strong> {{ order.phone }}
+        </div>
+        
+        <div class="order-info">
+            <strong>Email:</strong> {{ order.email }}
+        </div>
+        
+        <div class="order-info">
+            <strong>Статус:</strong> {{ order.get_status_display }}
+        </div>
+        
+        <h4>Состав заказа:</h4>
+        <div class="order-items">
+            {% for item in order.cart.items.all %}
+            <div class="order-item">
+                <span>{{ item.product_name }}</span>
+                <span>{{ item.quantity }} шт. x {{ item.unit_price }} руб.</span>
+                <span><strong>{{ item.total_price }} руб.</strong></span>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="order-total">
+            <span>Общая сумма:</span>
+            <span>{{ order.total_price }} руб.</span>
+        </div>
+    </div>
+    
+    <p>Мы свяжемся с вами в ближайшее время для уточнения деталей доставки.</p>
+    
+    <a href="{% url 'index' %}" class="btn-continue">
+        Продолжить покупки
+    </a>
+</div>
+{% endblock %}

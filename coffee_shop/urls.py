@@ -25,6 +25,7 @@ from products.views import index
 urlpatterns = [
 
     path('admin/', admin.site.urls),
+    path('accounts/', include('django.contrib.auth.urls')),
     path('users/', include('users.urls')),
     path('products/', include("products.urls")),
     path('', index, name='index'),
@@ -34,3 +35,4 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    

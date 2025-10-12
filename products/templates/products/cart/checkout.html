@@ -1,0 +1,253 @@
+{% extends "products/base.html" %}
+
+{% block content %}
+<style>
+    .checkout-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .checkout-title {
+        color: #2c5aa0;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .order-summary {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+    
+    .order-items {
+        margin: 15px 0;
+    }
+    
+    .order-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .order-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 0;
+        border-top: 2px solid #2c5aa0;
+        font-size: 1.2em;
+        font-weight: bold;
+        color: #2c5aa0;
+    }
+    
+    .checkout-form {
+        background-color: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #333;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1em;
+        box-sizing: border-box;
+    }
+    
+    .form-control:focus {
+        border-color: #2c5aa0;
+        box-shadow: 0 0 0 2px rgba(44, 90, 160, 0.25);
+        outline: none;
+    }
+    
+    .btn-primary {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 5px;
+        font-size: 1.1em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        width: 100%;
+    }
+    
+    .btn-primary:hover {
+        background-color: #218838;
+    }
+    
+    .form-row {
+        display: flex;
+        gap: 15px;
+    }
+    
+    .form-row .form-group {
+        flex: 1;
+    }
+    
+    .back-to-cart {
+        display: inline-block;
+        color: #2c5aa0;
+        text-decoration: none;
+        margin-bottom: 20px;
+        font-weight: bold;
+    }
+    
+    .back-to-cart:hover {
+        text-decoration: underline;
+    }
+    
+    .required::after {
+        content: " *";
+        color: #dc3545;
+    }
+</style>
+
+<div class="checkout-container">
+    <a href="{% url 'cart_detail' %}" class="back-to-cart">← Вернуться в корзину</a>
+    
+    <h1 class="checkout-title">Оформление заказа</h1>
+    
+    <!-- Сводка заказа -->
+    <div class="order-summary">
+        <h3>Ваш заказ</h3>
+        <div class="order-items">
+            {% for item in cart.items.all %}
+            <div class="order-item">
+                <span>{{ item.product_name }}</span>
+                <span>{{ item.quantity }} шт. x {{ item.unit_price }} руб.</span>
+                <span><strong>{{ item.total_price }} руб.</strong></span>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="order-total">
+            <span>Общая сумма:</span>
+            <span>{{ cart.total_price }} руб.</span>
+        </div>
+    </div>
+    
+    <!-- Форма оформления заказа -->
+    <div class="checkout-form">
+        <h3>Контактная информация</h3>
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="id_first_name" class="required">Имя</label>
+                    <input type="text" 
+                           name="first_name" 
+                           id="id_first_name" 
+                           class="form-control"
+                           value="{{ form.first_name.value|default:'' }}"
+                           required
+                           placeholder="Введите ваше имя">
+                    {% if form.first_name.errors %}
+                        <div class="error" style="color: #dc3545; font-size: 0.9em; margin-top: 5px;">
+                            {{ form.first_name.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_last_name" class="required">Фамилия</label>
+                    <input type="text" 
+                           name="last_name" 
+                           id="id_last_name" 
+                           class="form-control"
+                           value="{{ form.last_name.value|default:'' }}"
+                           required
+                           placeholder="Введите вашу фамилию">
+                    {% if form.last_name.errors %}
+                        <div class="error" style="color: #dc3545; font-size: 0.9em; margin-top: 5px;">
+                            {{ form.last_name.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="id_phone" class="required">Телефон</label>
+                <input type="tel" 
+                       name="phone" 
+                       id="id_phone" 
+                       class="form-control"
+                       value="{{ form.phone.value|default:'' }}"
+                       required
+                       placeholder="+375 (12) 345-67-89"
+                       pattern="\+375\s?\(?\d{2}\)?\s?\d{3}[\s-]?\d{2}[\s-]?\d{2}">
+                <small style="color: #666; font-size: 0.9em;">Формат: +375 (12) 345-67-89</small>
+                {% if form.phone.errors %}
+                    <div class="error" style="color: #dc3545; font-size: 0.9em; margin-top: 5px;">
+                        {{ form.phone.errors }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="id_email" class="required">Электронная почта</label>
+                <input type="email" 
+                       name="email" 
+                       id="id_email" 
+                       class="form-control"
+                       value="{{ form.email.value|default:'' }}"
+                       required
+                       placeholder="your@email.com">
+                {% if form.email.errors %}
+                    <div class="error" style="color: #dc3545; font-size: 0.9em; margin-top: 5px;">
+                        {{ form.email.errors }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <button type="submit" class="btn-primary">
+                Подтвердить заказ
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Маска для телефона
+    const phoneInput = document.getElementById('id_phone');
+    
+    phoneInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        
+        if (value.startsWith('375')) {
+            value = '+' + value;
+        } else if (!value.startsWith('+375') && value.length > 0) {
+            value = '+375' + value;
+        }
+        
+        // Форматирование: +375 (12) 345-67-89
+        if (value.length > 4) {
+            value = value.substring(0, 4) + ' (' + value.substring(4, 6) + ') ' + value.substring(6, 9) + '-' + value.substring(9, 11) + '-' + value.substring(11, 13);
+        } else if (value.length > 4) {
+            value = value.substring(0, 4) + ' (' + value.substring(4);
+        }
+        
+        e.target.value = value;
+    });
+});
+</script>
+{% endblock %}

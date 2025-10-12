@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.contrib.auth.models import User
 
 
 class Product(models.Model):
@@ -189,3 +190,169 @@ class Syrup(Product):
     class Meta:
         verbose_name = 'Сироп'
         verbose_name_plural = 'Сиропы'
+
+
+# МОДЕЛИ КОРЗИНЫ (ТОЛЬКО ДЛЯ АВТОРИЗОВАННЫХ ПОЛЬЗОВАТЕЛЕЙ)
+
+class Cart(models.Model):
+    user = models.ForeignKey( 
+        User, 
+        on_delete=models.CASCADE, 
+        verbose_name='Пользователь'
+    )
+    is_active = models.BooleanField(default=True, verbose_name='Активная корзина')  # ← Добавляем поле
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создан')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='Обновлен')
+    
+    @property
+    def total_price(self):
+        return sum(item.total_price for item in self.items.all())
+    
+    @property
+    def total_items(self):
+        return sum(item.quantity for item in self.items.all())
+    
+    def __str__(self):
+        status = "активная" if self.is_active else "неактивная"
+        return f"Корзина {self.id} ({status}) - {self.user.username}"
+    
+    class Meta:
+        verbose_name = 'Корзина'
+        verbose_name_plural = 'Корзины'
+
+
+class CartItem(models.Model):
+    PRODUCT_TYPES = [
+        ('coffee', 'Кофе'),
+        ('tea', 'Чай'),
+        ('syrup', 'Сироп'),
+    ]
+    
+    cart = models.ForeignKey(
+        Cart, 
+        on_delete=models.CASCADE, 
+        related_name='items', 
+        verbose_name='Корзина'
+    )
+    
+    # Поля для связи с разными типами продуктов
+    product_type = models.CharField(
+        max_length=10, 
+        choices=PRODUCT_TYPES, 
+        verbose_name='Тип товара'
+    )
+    product_id = models.PositiveIntegerField(verbose_name='ID товара')
+    
+    # Для кофе и чая нужно хранить выбранный вес
+    grams = models.PositiveIntegerField(
+        null=True, 
+        blank=True, 
+        verbose_name='Вес (граммы)',
+        help_text='Только для кофе и чая'
+    )
+    
+    quantity = models.PositiveIntegerField(default=1, verbose_name='Количество')
+    
+    @property
+    def product(self):
+        """Возвращает объект продукта в зависимости от типа"""
+        if self.product_type == 'coffee':
+            return Coffee.objects.filter(id=self.product_id).first()
+        elif self.product_type == 'tea':
+            return Tea.objects.filter(id=self.product_id).first()
+        elif self.product_type == 'syrup':
+            return Syrup.objects.filter(id=self.product_id).first()
+        return None
+    
+    @property
+    def unit_price(self):
+        """Возвращает цену за единицу товара"""
+        product = self.product
+        if not product:
+            return 0
+        
+        if self.product_type == 'coffee' and self.grams:
+            return product.get_price(self.grams) or 0
+        elif self.product_type == 'tea' and self.grams:
+            return product.get_price(self.grams) or 0
+        elif self.product_type == 'syrup':
+            return product.price or 0
+        return 0
+    
+    @property
+    def total_price(self):
+        return self.unit_price * self.quantity
+    
+    @property
+    def product_name(self):
+        product = self.product
+        if product:
+            if self.product_type == 'coffee' and self.grams:
+                return f"{product.name} ({self.grams}г)"
+            elif self.product_type == 'tea' and self.grams:
+                return f"{product.name} ({self.grams}г)"
+            else:
+                return str(product)
+        return "Товар не найден"
+    
+    def __str__(self):
+        return f"{self.quantity} x {self.product_name}"
+    
+    class Meta:
+        verbose_name = 'Элемент корзины'
+        verbose_name_plural = 'Элементы корзины'
+        unique_together = ['cart', 'product_type', 'product_id', 'grams']
+
+class Order(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Ожидает обработки'),
+        ('confirmed', 'Подтвержден'),
+        ('shipped', 'Отправлен'),
+        ('delivered', 'Доставлен'),
+        ('cancelled', 'Отменен'),
+    ]
+    
+    # Связь один-ко-многим с пользователем
+    user = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        verbose_name='Пользователь',
+        null=True, 
+        blank=True
+    )
+    
+    # Связь один-ко-многим с корзиной (один заказ - одна корзина)
+    cart = models.ForeignKey(
+        Cart, 
+        on_delete=models.CASCADE, 
+        verbose_name='Корзина'
+    )
+    
+    # Контактная информация
+    first_name = models.CharField(max_length=100, verbose_name='Имя')
+    last_name = models.CharField(max_length=100, verbose_name='Фамилия')
+    phone = models.CharField(max_length=20, verbose_name='Телефон')
+    email = models.EmailField(verbose_name='Электронная почта')
+    
+    # Статус и даты
+    status = models.CharField(
+        max_length=10, 
+        choices=STATUS_CHOICES, 
+        default='pending', 
+        verbose_name='Статус'
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создан')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='Обновлен')
+    total_price = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2, 
+        verbose_name='Общая сумма'
+    )
+    
+    def __str__(self):
+        return f"Заказ #{self.id} - {self.first_name} {self.last_name} ({self.status})"
+    
+    class Meta:
+        verbose_name = 'Заказ'
+        verbose_name_plural = 'Заказы'
+        ordering = ['-created_at']  # Сортировка по дате создания (новые сначала)
