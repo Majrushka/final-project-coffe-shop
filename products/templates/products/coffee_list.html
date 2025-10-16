@@ -135,6 +135,58 @@
         text-align: center;
     }
 
+    /* Стили для кнопки "В корзину" */
+    .add-to-cart-btn {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1em;
+        font-weight: bold;
+        transition: all 0.2s;
+        display: block;
+        margin: 10px auto;
+        width: 80%;
+        text-align: center;
+    }
+    
+    .add-to-cart-btn:hover {
+        background-color: #218838;
+        transform: translateY(-1px);
+    }
+    
+    .add-to-cart-btn:disabled {
+        background-color: #6c757d;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* Стили для формы */
+    .add-to-cart-form {
+        margin: 10px 0;
+    }
+    
+    .login-prompt {
+        background-color: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 4px;
+        padding: 10px;
+        margin: 10px 0;
+        text-align: center;
+    }
+    
+    .login-prompt a {
+        color: #2c5aa0;
+        font-weight: bold;
+        text-decoration: none;
+    }
+    
+    .login-prompt a:hover {
+        text-decoration: underline;
+    }
+
     /* Стили для пагинации */
     .pagination {
         display: flex;
@@ -237,13 +289,13 @@
                 <div class="weight-selector">
                     <strong>Выберите вес:</strong>
                     <div class="weight-buttons">
-                        <button class="weight-btn active" data-weight="250" data-price="{{ coffee.price_250g }}">
+                        <button type="button" class="weight-btn active" data-weight="250" data-price="{{ coffee.price_250g }}">
                             250 г
                         </button>
-                        <button class="weight-btn" data-weight="500" data-price="{{ coffee.price_500g }}">
+                        <button type="button" class="weight-btn" data-weight="500" data-price="{{ coffee.price_500g }}">
                             500 г
                         </button>
-                        <button class="weight-btn" data-weight="1000" data-price="{{ coffee.price_1000g }}">
+                        <button type="button" class="weight-btn" data-weight="1000" data-price="{{ coffee.price_1000g }}">
                             1000 г
                         </button>
                     </div>
@@ -252,7 +304,25 @@
                     </div>
                 </div>
                 
-                <p><em>В наличии: {% if coffee.is_available %}Да{% else %}Нет{% endif %}</em></p>
+                <p class="{% if coffee.is_available %}availability{% else %}not-available{% endif %}">
+                    <strong>В наличии:</strong> {% if coffee.is_available %}Да{% else %}Нет{% endif %}
+                </p>
+                
+                <!-- Кнопка "В корзину" -->
+                {% if user.is_authenticated %}
+                    <form method="post" action="{% url 'add_coffee_to_cart' coffee.id %}" class="add-to-cart-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="grams" id="grams-{{ coffee.id }}" value="250" required>
+                        <input type="hidden" name="quantity" value="1">
+                        <button type="submit" class="add-to-cart-btn" {% if not coffee.is_available %}disabled{% endif %}>
+                            В корзину
+                        </button>
+                    </form>
+                {% else %}
+                    <div class="login-prompt">
+                        <a href="{% url 'login' %}">Войдите</a>, чтобы добавить в корзину
+                    </div>
+                {% endif %}
             </div>
         {% endfor %}
     </div>
@@ -308,10 +378,54 @@
                 
                 // Получаем цену из data-атрибута
                 const price = this.getAttribute('data-price');
+                const weight = this.getAttribute('data-weight');
                 
                 // Находим элемент для отображения цены и обновляем его
                 const priceDisplay = productItem.querySelector('.selected-price');
                 priceDisplay.textContent = `Цена: ${price} руб.`;
+                
+                // Обновляем скрытое поле с выбранным весом
+                const gramsInput = productItem.querySelector('input[name="grams"]');
+                if (gramsInput) {
+                    gramsInput.value = weight;
+                }
+            });
+        });
+
+        // Обработчик для форм добавления в корзину
+        const cartForms = document.querySelectorAll('.add-to-cart-form');
+        cartForms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault(); // Предотвращаем стандартную отправку формы
+                
+                const formData = new FormData(this);
+                const url = this.action;
+                
+                fetch(url, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Показываем сообщение об успехе
+                        alert('Товар добавлен в корзину!');
+                        // Можно обновить счетчик корзины в шапке
+                        const cartBadge = document.querySelector('.cart-badge');
+                        if (cartBadge) {
+                            cartBadge.textContent = data.cart_total_items;
+                        }
+                    } else {
+                        alert('Ошибка: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Произошла ошибка при добавлении в корзину');
+                });
             });
         });
     });

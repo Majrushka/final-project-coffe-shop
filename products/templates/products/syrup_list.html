@@ -13,13 +13,14 @@
     }
     .syrup-item {
         border: 1px solid #ddd;
-        padding: 15px;
+        padding: 20px;
         border-radius: 5px;
         width: calc(50% - 10px);
         box-sizing: border-box;
-        aspect-ratio: 1/1;
+        aspect-ratio: 3/4; /* Изменил соотношение сторон для большего пространства */
         overflow: hidden;
         transition: transform 0.2s, box-shadow 0.2s;
+        min-height: 500px; /* Минимальная высота для гарантии места */
     }
     .syrup-item:hover {
         transform: translateY(-2px);
@@ -34,7 +35,7 @@
         object-fit: cover;
         float: right;
         margin-left: 15px;
-        margin-bottom: 10px;
+        margin-bottom: 15px;
     }
     
     .image-placeholder {
@@ -45,7 +46,7 @@
         border-radius: 8px;
         float: right;
         margin-left: 15px;
-        margin-bottom: 10px;
+        margin-bottom: 15px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -58,6 +59,8 @@
     .syrup-title {
         color: #2c5aa0;
         text-decoration: none;
+        margin-bottom: 10px;
+        display: block;
     }
     .syrup-title:hover {
         text-decoration: underline;
@@ -66,15 +69,127 @@
     .characteristics {
         color: #666;
         font-size: 0.9em;
+        margin: 10px 0;
     }
     .prices {
         color: #2c5aa0;
         font-weight: bold;
         background-color: #f8f9fa;
-        padding: 8px;
+        padding: 10px;
         border-radius: 4px;
-        margin: 10px 0;
+        margin: 15px 0;
         text-align: center;
+    }
+
+    /* Стили для кнопки "В корзину" */
+    .add-to-cart-btn {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1em;
+        font-weight: bold;
+        transition: all 0.2s;
+        display: block;
+        margin: 15px auto;
+        width: 90%;
+        text-align: center;
+    }
+    
+    .add-to-cart-btn:hover {
+        background-color: #218838;
+        transform: translateY(-1px);
+    }
+    
+    .add-to-cart-btn:disabled {
+        background-color: #6c757d;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* Стили для формы */
+    .add-to-cart-form {
+        margin: 15px 0;
+    }
+    
+    .login-prompt {
+        background-color: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 4px;
+        padding: 12px;
+        margin: 15px 0;
+        text-align: center;
+    }
+    
+    .login-prompt a {
+        color: #2c5aa0;
+        font-weight: bold;
+        text-decoration: none;
+    }
+    
+    .login-prompt a:hover {
+        text-decoration: underline;
+    }
+
+    .availability {
+        color: #28a745;
+        margin: 10px 0;
+    }
+    
+    .not-available {
+        color: #dc3545;
+        margin: 10px 0;
+    }
+
+    /* Улучшенные стили для текстового контента */
+    .product-description {
+        margin: 10px 0;
+        line-height: 1.4;
+    }
+
+    /* Стили для пагинации */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 30px 0;
+        gap: 10px;
+    }
+
+    .pagination a, .pagination span {
+        padding: 8px 16px;
+        text-decoration: none;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        color: #2c5aa0;
+        transition: all 0.2s;
+    }
+
+    .pagination a:hover {
+        background-color: #f0f5ff;
+        border-color: #2c5aa0;
+    }
+
+    .pagination .current {
+        background-color: #2c5aa0;
+        color: white;
+        border-color: #2c5aa0;
+    }
+
+    .pagination .disabled {
+        color: #ccc;
+        cursor: not-allowed;
+        border-color: #eee;
+    }
+
+    .step-links {
+        display: flex;
+        gap: 5px;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
     }
 </style>
 
@@ -99,7 +214,9 @@
                     </div>
                 {% endif %}
                 
-                <p>{{ syrup.description }}</p>
+                <div class="product-description">
+                    {{ syrup.description }}
+                </div>
                 
                 <div class="characteristics">
                     <p><strong>Производитель:</strong> {{ syrup.get_manufacturer_display }}</p>
@@ -109,11 +226,98 @@
                     <p><strong>Цена:</strong> {{ syrup.price }} руб.</p>
                 </div>
                 
-                <p><em>В наличии: {% if syrup.is_available %}Да{% else %}Нет{% endif %}</em></p>
+                <p class="{% if syrup.is_available %}availability{% else %}not-available{% endif %}">
+                    <strong>В наличии:</strong> {% if syrup.is_available %}Да{% else %}Нет{% endif %}
+                </p>
+                
+                <!-- Кнопка "В корзину" -->
+                {% if user.is_authenticated %}
+                    <form method="post" action="{% url 'add_syrup_to_cart' syrup.id %}" class="add-to-cart-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="grams" value="">
+                        <input type="hidden" name="quantity" value="1">
+                        <button type="submit" class="add-to-cart-btn" {% if not syrup.is_available %}disabled{% endif %}>
+                            В корзину
+                        </button>
+                    </form>
+                {% else %}
+                    <div class="login-prompt">
+                        <a href="{% url 'login' %}">Войдите</a>, чтобы добавить в корзину
+                    </div>
+                {% endif %}
             </div>
         {% endfor %}
     </div>
+
+    <!-- Пагинация -->
+    {% if syrups.has_other_pages %}
+    <div class="pagination">
+        <div class="step-links">
+            {% if syrups.has_previous %}
+                <a href="?page=1">&laquo; Первая</a>
+                <a href="?page={{ syrups.previous_page_number }}">Назад</a>
+            {% else %}
+                <span class="disabled">&laquo; Первая</span>
+                <span class="disabled">Назад</span>
+            {% endif %}
+
+            <span class="current">
+                Страница {{ syrups.number }} из {{ syrups.paginator.num_pages }}
+            </span>
+
+            {% if syrups.has_next %}
+                <a href="?page={{ syrups.next_page_number }}">Вперед</a>
+                <a href="?page={{ syrups.paginator.num_pages }}">Последняя &raquo;</a>
+            {% else %}
+                <span class="disabled">Вперед</span>
+                <span class="disabled">Последняя &raquo;</span>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
 {% else %}
     <p>К сожалению, сиропов временно нет в наличии.</p>
 {% endif %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Обработчик для форм добавления в корзину
+        const cartForms = document.querySelectorAll('.add-to-cart-form');
+        cartForms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault(); // Предотвращаем стандартную отправку формы
+                
+                const formData = new FormData(this);
+                const url = this.action;
+                
+                fetch(url, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Показываем сообщение об успехе
+                        alert('Товар добавлен в корзину!');
+                        // Можно обновить счетчик корзины в шапке
+                        const cartBadge = document.querySelector('.cart-badge');
+                        if (cartBadge) {
+                            cartBadge.textContent = data.cart_total_items;
+                        }
+                    } else {
+                        alert('Ошибка: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Произошла ошибка при добавлении в корзину');
+                });
+            });
+        });
+    });
+</script>
 {% endblock content %}

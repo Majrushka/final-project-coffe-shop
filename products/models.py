@@ -356,3 +356,30 @@ class Order(models.Model):
         verbose_name = 'Заказ'
         verbose_name_plural = 'Заказы'
         ordering = ['-created_at']  # Сортировка по дате создания (новые сначала)
+
+class TelegramUser(models.Model):
+    user = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        verbose_name='Пользователь',
+        null=True,
+        blank=True
+    )
+    phone_number = models.CharField(
+        max_length=20, 
+        verbose_name='Номер телефона',
+        unique=True
+    )
+    telegram_chat_id = models.BigIntegerField(
+        verbose_name='ID чата Telegram',
+        unique=True
+    )
+    is_active = models.BooleanField(default=True, verbose_name='Активен')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создан')
+    
+    def __str__(self):
+        return f"{self.phone_number} (Chat ID: {self.telegram_chat_id})"
+    
+    class Meta:
+        verbose_name = 'Пользователь Telegram'
+        verbose_name_plural = 'Пользователи Telegram'

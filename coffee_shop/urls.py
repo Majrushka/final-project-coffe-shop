@@ -25,6 +25,7 @@ from products.views import index
 urlpatterns = [
 
     path('admin/', admin.site.urls),
+    path('api/', include('api.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('users/', include('users.urls')),
     path('products/', include("products.urls")),

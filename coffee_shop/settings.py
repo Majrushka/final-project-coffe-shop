@@ -41,6 +41,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # мои приложения
+    'rest_framework',
+    'api',
+    'telegram_bot',
     'products',
     'users',
 ]
@@ -144,4 +147,12 @@ LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
+# REST Framework settings
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ]
+}
 
+# Telegram Bot settings
+TELEGRAM_BOT_TOKEN = '8368410771:AAHNT9_tKmog0Ij-F9oVyS09XXy1JLOex9g'
