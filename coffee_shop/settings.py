@@ -131,7 +131,7 @@ STATIC_URL = 'static/'
 
 # Пути, по которым Django ищет статические файлы
 STATICFILES_DIRS = [
-    BASE_DIR / "static",  # Проектная папка static
+    BASE_DIR / "static",  
 ]
 
 # Папка для сбора статики командой collectstatic (для продакшена)

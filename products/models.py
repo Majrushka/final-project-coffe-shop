@@ -193,14 +193,13 @@ class Syrup(Product):
 
 
 # МОДЕЛИ КОРЗИНЫ (ТОЛЬКО ДЛЯ АВТОРИЗОВАННЫХ ПОЛЬЗОВАТЕЛЕЙ)
-
 class Cart(models.Model):
     user = models.ForeignKey( 
         User, 
         on_delete=models.CASCADE, 
         verbose_name='Пользователь'
     )
-    is_active = models.BooleanField(default=True, verbose_name='Активная корзина')  # ← Добавляем поле
+    is_active = models.BooleanField(default=True, verbose_name='Активная корзина')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создан')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Обновлен')
     
@@ -243,7 +242,6 @@ class CartItem(models.Model):
     )
     product_id = models.PositiveIntegerField(verbose_name='ID товара')
     
-    # Для кофе и чая нужно хранить выбранный вес
     grams = models.PositiveIntegerField(
         null=True, 
         blank=True, 
@@ -321,7 +319,7 @@ class Order(models.Model):
         blank=True
     )
     
-    # Связь один-ко-многим с корзиной (один заказ - одна корзина)
+    # Связь один-ко-многим с корзиной
     cart = models.ForeignKey(
         Cart, 
         on_delete=models.CASCADE, 
@@ -355,7 +353,7 @@ class Order(models.Model):
     class Meta:
         verbose_name = 'Заказ'
         verbose_name_plural = 'Заказы'
-        ordering = ['-created_at']  # Сортировка по дате создания (новые сначала)
+        ordering = ['-created_at']
 
 class TelegramUser(models.Model):
     user = models.ForeignKey(

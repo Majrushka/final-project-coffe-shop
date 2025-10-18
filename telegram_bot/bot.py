@@ -136,7 +136,7 @@ class CoffeeShopBot:
             result = phone
         
         # Белорусские номера
-        elif phone.startswith('80') and len(phone) == 11:  # 8029...
+        elif phone.startswith('80') and len(phone) == 11:
             result = '+375' + phone[2:]
         elif phone.startswith('375') and len(phone) == 12:
             result = '+' + phone

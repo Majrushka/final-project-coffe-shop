@@ -23,10 +23,10 @@
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
     
-    /* Стили для изображения внутри квадрата - УВЕЛИЧЕНО В 2 РАЗА */
+    /* Стили для изображения внутри квадрата */
     .coffee-image {
-        width: 240px;  /* 120px * 2 = 240px */
-        height: 240px; /* 120px * 2 = 240px */
+        width: 240px;
+        height: 240px;
         border-radius: 8px;
         object-fit: cover;
         float: right;
@@ -93,7 +93,7 @@
         color: #ffc107;
     }
     
-    /* Новые стили для кнопок выбора веса */
+    /* стили для кнопок выбора веса */
     .weight-selector {
         margin: 10px 0;
     }
@@ -243,7 +243,7 @@
                     </a>
                 </h2>
                 
-                <!-- Изображение внутри квадрата - УВЕЛИЧЕНО В 2 РАЗА -->
+                <!-- Изображение внутри квадрата -->
                 {% if coffee.image %}
                     <img src="{{ coffee.image.url }}" alt="{{ coffee.name }}" class="coffee-image">
                 {% else %}

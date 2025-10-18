@@ -4,36 +4,254 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
 from django.http import JsonResponse
-from .models import Coffee, Tea, Syrup, Cart, CartItem, Order
-from .forms import AddToCartForm, UpdateCartForm, OrderForm   
 from django.core.paginator import Paginator
 from django.core.mail import send_mail
 from django.conf import settings
 from django.db import IntegrityError
+import logging
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
-# ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ ДЛЯ ПОЛУЧЕНИЯ КОРЗИНЫ
+from .models import Coffee, Tea, Syrup, Cart, CartItem, Order, TelegramUser
+from .forms import AddToCartForm, UpdateCartForm, OrderForm
+
+logger = logging.getLogger(__name__)
+
+# ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
 def get_user_cart(user):
     """Получение активной корзины пользователя"""
-    # Ищем все активные корзины пользователя
     active_carts = Cart.objects.filter(user=user, is_active=True)
     
-    # Если найдено несколько активных корзин
     if active_carts.count() > 1:
-        # Берем самую новую корзину
         cart = active_carts.order_by('-created_at').first()
-        # Деактивируем все остальные корзины
         active_carts.exclude(id=cart.id).update(is_active=False)
         return cart
-    # Если найдена одна корзина
     elif active_carts.count() == 1:
         return active_carts.first()
-    # Если нет активных корзин
     else:
-        # Создаем новую корзину
         cart = Cart.objects.create(user=user, is_active=True)
         return cart
 
-# СУЩЕСТВУЮЩИЕ ВЬЮШКИ (без изменений)
+def normalize_phone(phone):
+    """Нормализует номер телефона к стандартному формату"""
+    import re
+    digits = re.sub(r'\D', '', phone)
+    
+    if digits.startswith('375'):
+        return '+' + digits
+    elif digits.startswith('80'):
+        return '+375' + digits[2:]
+    elif len(digits) == 9 and digits.startswith(('29', '33', '44', '25')):
+        return '+375' + digits
+    else:
+        return '+' + digits
+
+def send_order_confirmation_email(order, cart):
+    """Отправка email с подтверждением заказа"""
+    try:
+        subject = f'Подтверждение заказа #{order.id}'
+        
+        items_list = ""
+        for item in cart.items.all():
+            items_list += f"- {item.product_name}: {item.quantity} шт. x {item.unit_price} руб. = {item.total_price} руб.\n"
+        
+        message = f"""
+        Уважаемый(ая) {order.first_name} {order.last_name}!
+
+        Благодарим вас за заказ в нашем магазине!
+
+        Детали заказа:
+        Номер заказа: #{order.id}
+        Дата заказа: {order.created_at.strftime('%d.%m.%Y %H:%M')}
+        
+        Состав заказа:
+        {items_list}
+        
+        Общая сумма: {order.total_price} руб.
+        
+        Контактная информация:
+        Телефон: {order.phone}
+        Email: {order.email}
+        
+        Статус заказа: {order.get_status_display()}
+        
+        Мы свяжемся с вами в ближайшее время для уточнения деталей доставки.
+        
+        С уважением,
+        Команда Fun Coffee
+        """
+        
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [order.email],
+            fail_silently=True,
+        )
+        logger.info(f"✅ Email подтверждения отправлен для заказа #{order.id}")
+    except Exception as e:
+        logger.error(f"❌ Ошибка отправки email для заказа #{order.id}: {str(e)}")
+
+def send_new_order_notification(order, cart):
+    """Отправка уведомления владельцу о новом заказе"""
+    try:
+        subject = f'Новый заказ #{order.id}'
+        
+        items_list = ""
+        for item in cart.items.all():
+            items_list += f"- {item.product_name}: {item.quantity} шт. x {item.unit_price} руб. = {item.total_price} руб.\n"
+        
+        message = f"""
+        ПОСТУПИЛ НОВЫЙ ЗАКАЗ!
+
+        Детали заказа:
+        Номер заказа: #{order.id}
+        Дата заказа: {order.created_at.strftime('%d.%m.%Y %H:%M')}
+        
+        Информация о клиенте:
+        Имя: {order.first_name} {order.last_name}
+        Телефон: {order.phone}
+        Email: {order.email}
+        
+        Состав заказа:
+        {items_list}
+        
+        Общая сумма: {order.total_price} руб.
+        
+        Статус заказа: {order.get_status_display()}
+        """
+        
+        owner_email = getattr(settings, 'OWNER_EMAIL', 'owner@example.com')
+        
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [owner_email],
+            fail_silently=True,
+        )
+        logger.info(f"✅ Уведомление владельцу отправлено для заказа #{order.id}")
+    except Exception as e:
+        logger.error(f"❌ Ошибка отправки уведомления владельцу: {str(e)}")
+
+# API ДЛЯ TELEGRAM БОТА
+@api_view(['POST'])
+def customer_orders(request):
+    """API для получения заказов клиента"""
+    try:
+        logger.info(f"📨 Получен запрос на поиск заказов. Данные: {request.data}")
+        
+        phone = request.data.get('phone')
+        telegram_chat_id = request.data.get('telegram_chat_id')
+        first_name = request.data.get('first_name')
+        last_name = request.data.get('last_name')
+        username = request.data.get('username')
+        
+        if not phone:
+            logger.error("❌ Phone number is required")
+            return Response({'error': 'Phone number is required'}, status=400)
+        
+        # Нормализация номера телефона
+        normalized_phone = normalize_phone(phone)
+        logger.info(f"🔧 Нормализация номера: {phone} -> {normalized_phone}")
+        
+        # ОБРАБОТКА TelegramUser - УПРОЩЕННЫЙ ПОДХОД
+        if telegram_chat_id:
+            try:
+                logger.info(f"🔍 Обработка Telegram пользователя с chat_id: {telegram_chat_id}")
+                
+                # Сначала пытаемся найти существующего пользователя по chat_id
+                existing_user_by_chat = TelegramUser.objects.filter(telegram_chat_id=telegram_chat_id).first()
+                
+                if existing_user_by_chat:
+                    logger.info(f"✅ Найден пользователь по chat_id: {existing_user_by_chat}")
+                    # Если нашли по chat_id - обновляем данные
+                    existing_user_by_chat.phone_number = normalized_phone
+                    existing_user_by_chat.first_name = first_name
+                    existing_user_by_chat.last_name = last_name
+                    existing_user_by_chat.username = username
+                    existing_user_by_chat.save()
+                    logger.info(f"📝 Обновлены данные пользователя")
+                else:
+                    # Если не нашли по chat_id, ищем по номеру телефона
+                    existing_user_by_phone = TelegramUser.objects.filter(phone_number=normalized_phone).first()
+                    
+                    if existing_user_by_phone:
+                        logger.info(f"✅ Найден пользователь по номеру телефона: {existing_user_by_phone}")
+                        # Обновляем chat_id у существующего пользователя
+                        existing_user_by_phone.telegram_chat_id = telegram_chat_id
+                        existing_user_by_phone.first_name = first_name
+                        existing_user_by_phone.last_name = last_name
+                        existing_user_by_phone.username = username
+                        existing_user_by_phone.save()
+                        logger.info(f"📝 Обновлен chat_id пользователя")
+                    else:
+                        # Создаем нового пользователя
+                        logger.info("🆕 Создание нового Telegram пользователя")
+                        telegram_user = TelegramUser(
+                            phone_number=normalized_phone,
+                            telegram_chat_id=telegram_chat_id,
+                            first_name=first_name,
+                            last_name=last_name,
+                            username=username
+                        )
+                        telegram_user.save()
+                        logger.info(f"✅ Создан новый пользователь: {telegram_user}")
+                        
+            except IntegrityError as e:
+                logger.warning(f"⚠️ IntegrityError: {str(e)}")
+                # В случае ошибки уникальности - просто логируем и продолжаем
+                logger.info("🔄 Пропускаем ошибку Telegram пользователя и продолжаем поиск заказов")
+            except Exception as e:
+                logger.error(f"❌ Ошибка обработки Telegram пользователя: {str(e)}")
+                # Продолжаем выполнение даже при ошибке
+        
+        # ПОИСК ЗАКАЗОВ (основная логика)
+        logger.info(f"🔍 Поиск заказов для телефона: {normalized_phone}")
+        
+        try:
+            orders = Order.objects.filter(phone=normalized_phone).order_by('-created_at')[:5]
+            logger.info(f"📦 Найдено заказов: {orders.count()}")
+        except Exception as e:
+            logger.error(f"❌ Ошибка при поиске заказов: {str(e)}")
+            return Response({'error': 'Ошибка поиска заказов'}, status=500)
+        
+        if not orders.exists():
+            logger.info(f"❌ Заказы не найдены для телефона: {normalized_phone}")
+            return Response({'error': 'Заказы не найдены'}, status=404)
+        
+        orders_data = []
+        for order in orders:
+            try:
+                order_data = {
+                    'id': order.id,
+                    'created_at': order.created_at.strftime('%d.%m.%Y %H:%M'),
+                    'total_price': str(order.total_price),
+                    'status': order.get_status_display(),
+                    'items': []
+                }
+                
+                for item in order.cart.items.all():
+                    order_data['items'].append({
+                        'product_name': item.product_name,
+                        'quantity': item.quantity,
+                        'unit_price': str(item.unit_price),
+                        'total_price': str(item.total_price)
+                    })
+                
+                orders_data.append(order_data)
+            except Exception as e:
+                logger.error(f"❌ Ошибка обработки заказа #{order.id}: {str(e)}")
+                continue
+        
+        logger.info(f"✅ Успешно возвращено {len(orders_data)} заказов")
+        return Response({'orders': orders_data})
+        
+    except Exception as e:
+        logger.error(f"❌ Общая ошибка в customer_orders: {str(e)}")
+        return Response({'error': 'Внутренняя ошибка сервера'}, status=500)
+
+# ОСНОВНЫЕ ВЬЮШКИ САЙТА
 def index(request):
     coffees = Coffee.objects.all().order_by('-is_available')
     teas = Tea.objects.all().order_by('-is_available')
@@ -134,7 +352,6 @@ def product_search(request):
 def add_to_cart(request, product_id):
     """Добавление товара в корзину"""
     
-    # Определяем тип продукта из URL
     if 'coffee' in request.path:
         product_type = 'coffee'
         product = get_object_or_404(Coffee, id=product_id, is_available=True)
@@ -156,21 +373,17 @@ def add_to_cart(request, product_id):
             quantity = form.cleaned_data['quantity']
             grams = form.cleaned_data['grams']
             
-            # Для сиропов граммы не нужны
             if product_type == 'syrup':
                 grams = None
             
-            # Проверяем доступность товара
             if not product.is_available:
                 messages.error(request, 'Этот товар временно недоступен')
                 return redirect(f'{product_type}_detail', pk=product_id)
             
-            # Проверяем валидность веса для кофе/чая
             if product_type in ['coffee', 'tea'] and not grams:
                 messages.error(request, 'Пожалуйста, выберите вес')
                 return redirect(f'{product_type}_detail', pk=product_id)
             
-            # Проверяем корректность веса
             if product_type == 'coffee' and grams not in [250, 500, 1000]:
                 messages.error(request, 'Неверный вес для кофе')
                 return redirect(f'{product_type}_detail', pk=product_id)
@@ -178,7 +391,6 @@ def add_to_cart(request, product_id):
                 messages.error(request, 'Неверный вес для чая')
                 return redirect(f'{product_type}_detail', pk=product_id)
             
-            # Создаем или обновляем элемент корзины
             cart_item, created = CartItem.objects.get_or_create(
                 cart=cart,
                 product_type=product_type,
@@ -194,7 +406,6 @@ def add_to_cart(request, product_id):
             else:
                 messages.success(request, f'Товар "{product.name}" добавлен в корзину')
             
-            # Если AJAX запрос, возвращаем JSON
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({
                     'success': True, 
@@ -264,25 +475,20 @@ def checkout(request):
         form = OrderForm(request.POST)
         if form.is_valid():
             try:
-                # Создаем заказ
                 order = form.save(commit=False)
                 order.user = request.user
                 order.cart = cart
                 order.total_price = cart.total_price
                 order.save()
                 
-                # Делаем корзину неактивной
                 cart.is_active = False
                 cart.save()
                 
-                # Новая корзина создастся автоматически при следующем обращении к get_user_cart()
-                
-                # Пытаемся отправить уведомление владельцу (если настроены email-настройки)
                 try:
+                    send_order_confirmation_email(order, cart)
                     send_new_order_notification(order, cart)
                 except Exception as e:
-                    # Если отправка email не настроена, просто игнорируем ошибку
-                    print(f"Не удалось отправить уведомление владельцу: {e}")
+                    logger.error(f"Ошибка отправки email: {str(e)}")
                 
                 messages.success(request, 'Ваш заказ успешно оформлен!')
                 return redirect('order_success', order_id=order.id)
@@ -291,7 +497,6 @@ def checkout(request):
                 messages.error(request, 'Произошла ошибка при создании заказа. Пожалуйста, попробуйте еще раз.')
                 return redirect('cart_detail')
     else:
-        # Предзаполняем форму данными пользователя, если они есть
         initial_data = {}
         if request.user.first_name:
             initial_data['first_name'] = request.user.first_name
@@ -312,7 +517,6 @@ def order_success(request, order_id):
     """Страница успешного оформления заказа"""
     order = get_object_or_404(Order, id=order_id, user=request.user)
     
-    # Дополнительная проверка, что заказ принадлежит пользователю
     if order.user != request.user:
         messages.error(request, 'У вас нет доступа к этому заказу')
         return redirect('index')
@@ -325,7 +529,6 @@ def order_management(request):
     """Страница управления заказами для администратора"""
     orders = Order.objects.all().order_by('-created_at')
     
-    # Фильтрация по статусу
     status_filter = request.GET.get('status')
     if status_filter:
         orders = orders.filter(status=status_filter)
@@ -336,89 +539,3 @@ def order_management(request):
         'current_status': status_filter,
     }
     return render(request, 'products/admin/order_management.html', context)
-
-def send_order_confirmation_email(order, cart):
-    """Отправка email с подтверждением заказа"""
-    subject = f'Подтверждение заказа #{order.id}'
-    
-    # Формируем список товаров
-    items_list = ""
-    for item in cart.items.all():
-        items_list += f"- {item.product_name}: {item.quantity} шт. x {item.unit_price} руб. = {item.total_price} руб.\n"
-    
-    message = f"""
-    Уважаемый(ая) {order.first_name} {order.last_name}!
-
-    Благодарим вас за заказ в нашем магазине!
-
-    Детали заказа:
-    Номер заказа: #{order.id}
-    Дата заказа: {order.created_at.strftime('%d.%m.%Y %H:%M')}
-    
-    Состав заказа:
-    {items_list}
-    
-    Общая сумма: {order.total_price} руб.
-    
-    Контактная информация:
-    Телефон: {order.phone}
-    Email: {order.email}
-    
-    Статус заказа: {order.get_status_display()}
-    
-    Мы свяжемся с вами в ближайшее время для уточнения деталей доставки.
-    
-    С уважением,
-    Команда Fun Coffee
-    """
-    
-    send_mail(
-        subject,
-        message,
-        settings.DEFAULT_FROM_EMAIL,
-        [order.email],
-        fail_silently=False,
-    )
-
-def send_new_order_notification(order, cart):
-    """Отправка уведомления владельцу о новом заказе"""
-    subject = f'Новый заказ #{order.id}'
-    
-    # Формируем список товаров
-    items_list = ""
-    for item in cart.items.all():
-        items_list += f"- {item.product_name}: {item.quantity} шт. x {item.unit_price} руб. = {item.total_price} руб.\n"
-    
-    message = f"""
-    ПОСТУПИЛ НОВЫЙ ЗАКАЗ!
-
-    Детали заказа:
-    Номер заказа: #{order.id}
-    Дата заказа: {order.created_at.strftime('%d.%m.%Y %H:%M')}
-    
-    Информация о клиенте:
-    Имя: {order.first_name} {order.last_name}
-    Телефон: {order.phone}
-    Email: {order.email}
-    
-    Состав заказа:
-    {items_list}
-    
-    Общая сумма: {order.total_price} руб.
-    
-    Статус заказа: {order.get_status_display()}
-    
-    Для обработки заказа перейдите в админку:
-    http://127.0.0.1:8000/admin/products/order/{order.id}/
-    """
-    
-    # Замените на email владельца
-    owner_email = 'ваш-email@gmail.com'  # ЗАМЕНИТЕ НА РЕАЛЬНЫЙ EMAIL
-    
-    send_mail(
-        subject,
-        message,
-        settings.DEFAULT_FROM_EMAIL,
-        [owner_email],
-        fail_silently=False,
-    )

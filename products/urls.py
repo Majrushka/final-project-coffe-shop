@@ -1,6 +1,23 @@
 
 from django.urls import path
-from .views import coffee_list, tea_list, syrup_list, delivery_info, product_search, coffee_detail, tea_detail, syrup_detail, add_to_cart, cart_detail, update_cart_item, remove_from_cart, clear_cart, order_success, checkout, order_management
+from .views import (
+    coffee_list,
+    tea_list, 
+    syrup_list,
+    delivery_info,
+    product_search,
+    coffee_detail,
+    tea_detail,
+    syrup_detail,
+    add_to_cart,
+    cart_detail,
+    update_cart_item,
+    remove_from_cart,
+    clear_cart,
+    order_success,
+    checkout,
+    order_management
+)
 from . import views
 
 
